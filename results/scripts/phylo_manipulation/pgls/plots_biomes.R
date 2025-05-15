@@ -1,2208 +1,805 @@
-
 # Plotting biomes results -------------------------------------------------
 
 
 ##sourcing the libraries and the directories
 source(file.path(getwd(), "/source.R"))
 
-# marginality -------------------------------------------------------------
-
-##calling dataframe
-biome_marg_results <- read_csv("data/processed/biome_marg_results.csv")
-
-#filtering
-biome_marg_results <- biome_marg_results %>% rename("p_value" = "Pr(>|t|)")
-
-#renaming
-biome_marg_results$term <- factor(biome_marg_results$term, levels = c("(Intercept)",
-                                                                      "log(low.age + 1)",
-                                                                      "log(int.age + 1)",
-                                                                      "log(high.age + 1)") ,
-                                  labels = c("Intercept",
-                                             "Age",
-                                             "Age",
-                                             "Age"))
-
-sig_marg_res <- biome_marg_results %>% filter(term == "Age",
-                                              p_value <= 0.05,
-                                              adj.r.squared > 0)
 
 
-
-##seven significant biomes
-biomes_sig_marg <- unique(sig_marg_res$biome)
-
-# specialization ----------------------------------------------------------
-
-##calling dataframe
-biome_spe_results <- read_csv("data/processed/biome_spe_results.csv")
-
-biome_spe_results <- biome_spe_results %>% rename("p_value" = "Pr(>|t|)")
-
-biome_spe_results$term <- factor(biome_spe_results$term, levels = c("(Intercept)",
-                                                                    "log(low.age + 1)",
-                                                                    "log(int.age + 1)",
-                                                                    "log(high.age + 1)") ,
-                                 labels = c("Intercept",
-                                            "Age",
-                                            "Age",
-                                            "Age"))
-
-sig_spe_res <- biome_spe_results %>% filter(term == "Age",
-                                            p_value <= 0.05,
-                                            adj.r.squared > 0)
-
-##seven biomes with significant results
-biomes_sig_spe <- unique(sig_spe_res$biome) 
+###############################################################################
+#########   most commented lines are parts of the script  ###################
+########    calling results of data generated from the server ##################
+########   The Rscript that generated these results is       #################
+########     the "biomes_pgls.R" described in the repo     ##################
+##############################################################################
 
 
+##calling data
 
-# Marginality -------------------------------------------------------------
 
+# Mammals -----------------------------------------------------------------
+
+# mammals_string <- list.files(path = "C:/Users/carlo/OneDrive/Desktop/niche_position2/biomes2/MAMMALIA")
+# 
+# list_mam <- vector(mode = "list", length = length(mammals_string))
+# 
+# for(i in seq_along(mammals_string)){
+#   
+#   list_mam[[i]] <- read_csv(paste0("C:/Users/carlo/OneDrive/Desktop/niche_position2/biomes2/MAMMALIA/",
+#                                    mammals_string[i]))
+#   
+# }
+# 
+# ######## marginality ############
+# mam_results <- do.call("rbind", list_mam)
+# 
+# mam_results$class <- "Mammals"
+# 
+# 
+# ##marginality
+# mam_marg <- mam_results %>% filter(variable == "marginality") %>% 
+#   mutate(term = str_replace(term, "^log\\(.*\\)$", "Beta")) %>% 
+#   filter(term == "Beta") %>% 
+#   dplyr::rename(p_value = `Pr(>|t|)`)
+# 
+# mam_marg$ext <- factor(mam_marg$ext, levels = c("low",
+#                                                     "int",
+#                                                     "high"),
+#                          ordered = TRUE)
+# 
+# write_csv(mam_marg, file = "results/data/processed/biomes/mam_marg_biomes.csv")
+
+#read
+mam_marg_biomes <- read_csv("results/data/processed/biomes/mam_marg_biomes.csv")
+
+##summarizing
+sum_mam_marg <- mam_marg_biomes %>% group_by(biome, ext) %>% 
+  summarize(
+    mean_B = mean(Estimate),
+    median_B = median(Estimate),
+    CI_lower_B = quantile(Estimate, 0.025),
+    CI_upper_B = quantile(Estimate, 0.975),
+    mean_p = mean(p_value),
+    median_p = median(p_value),
+    CI_lower_p = quantile(p_value, 0.025),
+    CI_upper_p = quantile(p_value, 0.975),
+    prop_significant = mean(p_value < 0.05),
+    mean_R = mean(adj.r.squared),
+    median_R = median(adj.r.squared),
+    CI_lower_R = quantile(adj.r.squared, 0.025),
+    CI_upper_R = quantile(adj.r.squared, 0.975),
+    mean_lambda = mean(lambda),
+    median_lambda = median(lambda),
+    CI_lower_lambda = mean(lam_low),
+    CI_upper_lambda = mean(lam_up))
+
+sum_mam_marg$class <- "mammals"
+
+sum_mam_marg$variable <- "marginality"
+
+
+########### specialization #######################
+
+# mam_spe <- mam_results %>% filter(variable == "specialization") %>% 
+#   mutate(term = str_replace(term, "^log\\(.*\\)$", "Beta")) %>% 
+#   filter(term == "Beta") %>% 
+#   dplyr::rename(p_value = `Pr(>|t|)`)
+# 
+# mam_spe$ext <- factor(mam_spe$ext, levels = c("low",
+#                                                 "int",
+#                                                 "high"),
+#                        ordered = TRUE)
+# 
+# write_csv(mam_spe, file = "results/data/processed/biomes/mam_spe_biomes.csv")
+
+#read
+mam_spe_biomes <- read_csv("results/data/processed/biomes/mam_spe_biomes.csv")
+
+
+##summarizing
+sum_mam_spe <- mam_spe %>% group_by(biome, ext) %>% 
+  summarize(
+    mean_B = mean(Estimate),
+    median_B = median(Estimate),
+    CI_lower_B = quantile(Estimate, 0.025),
+    CI_upper_B = quantile(Estimate, 0.975),
+    mean_p = mean(p_value),
+    median_p = median(p_value),
+    CI_lower_p = quantile(p_value, 0.025),
+    CI_upper_p = quantile(p_value, 0.975),
+    prop_significant = mean(p_value < 0.05),
+    mean_R = mean(adj.r.squared),
+    median_R = median(adj.r.squared),
+    CI_lower_R = quantile(adj.r.squared, 0.025),
+    CI_upper_R = quantile(adj.r.squared, 0.975),
+    mean_lambda = mean(lambda),
+    median_lambda = median(lambda),
+    CI_lower_lambda = mean(lam_low),
+    CI_upper_lambda = mean(lam_up))
+
+sum_mam_spe$class <- "mammals"
+
+sum_mam_spe$variable <- "specialization"
 
 
 
 # Birds -------------------------------------------------------------------
 
-####################high extinction#############################
+# birds_string <- list.files(path = "C:/Users/carlo/OneDrive/Desktop/niche_position2/biomes2/AVES")
+# 
+# list_birds <- vector(mode = "list", length = length(birds_string))
+# 
+# for(i in seq_along(birds_string)){
+#   
+#   list_birds[[i]] <- read_csv(paste0("C:/Users/carlo/OneDrive/Desktop/niche_position2/biomes2/AVES/",
+#                                    birds_string[i]))
+#   
+# }
+# 
+# ######## marginality ############
+# birds_results <- do.call("rbind", list_birds)
+# 
+# birds_results$class <- "birds"
+# 
+# 
+# ##marginality
+# birds_marg <- birds_results %>% filter(variable == "marginality") %>% 
+#   mutate(term = str_replace(term, "^log\\(.*\\)$", "Beta")) %>% 
+#   filter(term == "Beta") %>% 
+#   dplyr::rename(p_value = `Pr(>|t|)`)
+# 
+# birds_marg$ext <- factor(birds_marg$ext, levels = c("low",
+#                                                 "int",
+#                                                 "high"),
+#                        ordered = TRUE)
+# 
+# #write
+# write_csv(birds_marg, file = "results/data/processed/biomes/birds_marg_biomes.csv")
 
-biomes_sig_marg_birds <- sig_marg_res %>% filter(class == "AVES") %>%
-                                             pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_birds <- vert_enfa_ages %>% filter(className == "AVES",
-                                        biome %in% biomes_sig_marg_birds) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_birds$ext_age <- factor(vert_pivot_birds$ext_age, 
-                             levels = c("low.age",
-                                        "int.age",
-                                        "high.age"),
-                             ordered = TRUE)
-
-vert_pivot_birds$className <- factor(vert_pivot_birds$className,
-                               levels = c("AVES"),
-                               labels = c("Birds"
-                                          ),
-                               ordered = TRUE)
-vert_pivot_birds$biome <- factor(vert_pivot_birds$biome,
-                           levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                      "Tropical_&_subtropical_dry_broadleaf_forests",
-                                      "Tropical_&_subtropical_coniferous_forests",
-                                      "Tropical_&_subtropical_grasslands_savannas_and_shrublands",
-                                      "Deserts_and_xeric_shrublands"),
-                           labels = c("Tropical & subtropical moist broadleaf forests",
-                                      "Tropical & subtropical dry broadleaf forests",
-                                      "Tropical & subtropical coniferous forests",
-                                      "Tropical & subtropical grasslands savannas and shrublands",
-                                      "Deserts and xeric shrublands"),
-                           ordered = TRUE)
+#read
+birds_marg_biomes <- read_csv("results/data/processed/biomes/birds_marg_biomes.csv")
 
 
-## df elements of models
-ele_marg_birds <- biome_marg_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "AVES",
-         biome %in% biomes_sig_marg_birds) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
 
-##changing factors name for matching with vert_enfa
-ele_marg_birds$className <- factor(ele_marg_birds$className, levels = c("AVES"),
-                                   labels = c("Birds"))
+##summarizing
+sum_birds_marg <- birds_marg_biomes %>% group_by(biome, ext) %>% 
+  summarize(
+    mean_B = mean(Estimate),
+    median_B = median(Estimate),
+    CI_lower_B = quantile(Estimate, 0.025),
+    CI_upper_B = quantile(Estimate, 0.975),
+    mean_p = mean(p_value),
+    median_p = median(p_value),
+    CI_lower_p = quantile(p_value, 0.025),
+    CI_upper_p = quantile(p_value, 0.975),
+    prop_significant = mean(p_value < 0.05),
+    mean_R = mean(adj.r.squared),
+    median_R = median(adj.r.squared),
+    CI_lower_R = quantile(adj.r.squared, 0.025),
+    CI_upper_R = quantile(adj.r.squared, 0.975),
+    mean_lambda = mean(lambda),
+    median_lambda = median(lambda),
+    CI_lower_lambda = mean(lam_low),
+    CI_upper_lambda = mean(lam_up))
 
-##High extinciton scenario
-ele_marg_birds_high <- ele_marg_birds %>% filter(ext == "high")
+sum_birds_marg$class <- "birds"
 
-##Biomes
-ele_marg_birds_high$biome <- factor(ele_marg_birds_high$biome,
-                                   levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                              "Tropical_&_subtropical_dry_broadleaf_forests",
-                                              "Tropical_&_subtropical_coniferous_forests",
-                                              "Tropical_&_subtropical_grasslands_savannas_and_shrublands",
-                                              "Deserts_and_xeric_shrublands"),
-                                   labels = c("Tropical & subtropical moist broadleaf forests",
-                                              "Tropical & subtropical dry broadleaf forests",
-                                              "Tropical & subtropical coniferous forests",
-                                              "Tropical & subtropical grasslands savannas and shrublands",
-                                              "Deserts and xeric shrublands"),
-                                   ordered = TRUE)
-
-png("text/figures/marginality/biomes/bird_model.png",
-    width = 50, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
+sum_birds_marg$variable <- "marginality"
 
 
-plot.birds.high.marg <- vert_pivot_birds %>% filter(ext_age == "high.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(marginality+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Marginality")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_marg_birds_high, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
+########### specialization #######################
+
+# birds_spe <- birds_results %>% filter(variable == "specialization") %>%
+#   mutate(term = str_replace(term, "^log\\(.*\\)$", "Beta")) %>%
+#   filter(term == "Beta") %>%
+#   dplyr::rename(p_value = `Pr(>|t|)`)
+# 
+# birds_spe$ext <- factor(birds_spe$ext, levels = c("low",
+#                                               "int",
+#                                               "high"),
+#                       ordered = TRUE)
+# 
+# #write
+# write_csv(birds_spe, file = "results/data/processed/biomes/birds_spe_biomes.csv")
+
+#read
+birds_spe_biomes <- read_csv("results/data/processed/biomes/birds_spe_biomes.csv")
+
+
+##summarizing
+sum_birds_spe <- birds_spe_biomes %>% group_by(biome, ext) %>% 
+  summarize(
+    mean_B = mean(Estimate),
+    median_B = median(Estimate),
+    CI_lower_B = quantile(Estimate, 0.025),
+    CI_upper_B = quantile(Estimate, 0.975),
+    mean_p = mean(p_value),
+    median_p = median(p_value),
+    CI_lower_p = quantile(p_value, 0.025),
+    CI_upper_p = quantile(p_value, 0.975),
+    prop_significant = mean(p_value < 0.05),
+    mean_R = mean(adj.r.squared),
+    median_R = median(adj.r.squared),
+    CI_lower_R = quantile(adj.r.squared, 0.025),
+    CI_upper_R = quantile(adj.r.squared, 0.975),
+    mean_lambda = mean(lambda),
+    median_lambda = median(lambda),
+    CI_lower_lambda = mean(lam_low),
+    CI_upper_lambda = mean(lam_up))
+
+sum_birds_spe$class <- "birds"
+
+sum_birds_spe$variable <- "specialization"
+
+
+# reptiles -------------------------------------------------------------------
+
+reptiles_string <- list.files(path = "C:/Users/carlo/OneDrive/Desktop/niche_position2/biomes2/REPTILIA")
+
+list_reptiles <- vector(mode = "list", length = length(reptiles_string))
+
+for(i in seq_along(reptiles_string)){
+  
+  list_reptiles[[i]] <- read_csv(paste0("C:/Users/carlo/OneDrive/Desktop/niche_position2/biomes2/REPTILIA/",
+                                        reptiles_string[i]))
+  
+}
+
+######## marginality ############
+# reptiles_results <- do.call("rbind", list_reptiles)
+# 
+# reptiles_results$class <- "reptiles"
+# 
+# 
+# ##marginality
+# reptiles_marg <- reptiles_results %>% filter(variable == "marginality") %>% 
+#   mutate(term = str_replace(term, "^log\\(.*\\)$", "Beta")) %>% 
+#   filter(term == "Beta") %>% 
+#   dplyr::rename(p_value = `Pr(>|t|)`)
+# 
+# reptiles_marg$ext <- factor(reptiles_marg$ext, levels = c("low",
+#                                                     "int",
+#                                                     "high"),
+#                          ordered = TRUE)
+# 
+# 
+# #write
+# write_csv(reptiles_marg, file = "results/data/processed/biomes/reptiles_marg_biomes.csv")
+
+#read
+reptiles_marg_biomes <- read_csv("results/data/processed/biomes/reptiles_marg_biomes.csv")
+
+
+##summarizing
+sum_reptiles_marg <- reptiles_marg_biomes %>% group_by(biome, ext) %>% 
+  summarize(
+    mean_B = mean(Estimate),
+    median_B = median(Estimate),
+    CI_lower_B = quantile(Estimate, 0.025),
+    CI_upper_B = quantile(Estimate, 0.975),
+    mean_p = mean(p_value),
+    median_p = median(p_value),
+    CI_lower_p = quantile(p_value, 0.025),
+    CI_upper_p = quantile(p_value, 0.975),
+    prop_significant = mean(p_value < 0.05),
+    mean_R = mean(adj.r.squared),
+    median_R = median(adj.r.squared),
+    CI_lower_R = quantile(adj.r.squared, 0.025),
+    CI_upper_R = quantile(adj.r.squared, 0.975),
+    mean_lambda = mean(lambda),
+    median_lambda = median(lambda),
+    CI_lower_lambda = mean(lam_low),
+    CI_upper_lambda = mean(lam_up))
+
+sum_reptiles_marg$class <- "reptiles"
+
+sum_reptiles_marg$variable <- "marginality"
+
+
+########### specialization #######################
+
+# reptiles_spe <- reptiles_results %>% filter(variable == "specialization") %>% 
+#   mutate(term = str_replace(term, "^log\\(.*\\)$", "Beta")) %>% 
+#   filter(term == "Beta") %>% 
+#   dplyr::rename(p_value = `Pr(>|t|)`)
+# 
+# reptiles_spe$ext <- factor(reptiles_spe$ext, levels = c("low",
+#                                                   "int",
+#                                                   "high"),
+#                         ordered = TRUE)
+# 
+# #write
+# write_csv(reptiles_spe, file = "results/data/processed/biomes/reptiles_spe_biomes.csv")
+
+#read
+reptiles_spe_biomes <- read_csv("results/data/processed/biomes/reptiles_spe_biomes.csv")
+
+
+##summarizing
+sum_reptiles_spe <- reptiles_spe_biomes %>% group_by(biome, ext) %>% 
+  summarize(
+    mean_B = mean(Estimate),
+    median_B = median(Estimate),
+    CI_lower_B = quantile(Estimate, 0.025),
+    CI_upper_B = quantile(Estimate, 0.975),
+    mean_p = mean(p_value),
+    median_p = median(p_value),
+    CI_lower_p = quantile(p_value, 0.025),
+    CI_upper_p = quantile(p_value, 0.975),
+    prop_significant = mean(p_value < 0.05),
+    mean_R = mean(adj.r.squared),
+    median_R = median(adj.r.squared),
+    CI_lower_R = quantile(adj.r.squared, 0.025),
+    CI_upper_R = quantile(adj.r.squared, 0.975),
+    mean_lambda = mean(lambda),
+    median_lambda = median(lambda),
+    CI_lower_lambda = mean(lam_low),
+    CI_upper_lambda = mean(lam_up))
+
+sum_reptiles_spe$class <- "reptiles"
+
+sum_reptiles_spe$variable <- "specialization"
+
+
+# amphibians -------------------------------------------------------------------
+
+# amphibians_string <- list.files(path = "C:/Users/carlo/OneDrive/Desktop/niche_position2/biomes2/AMPHIBIA")
+# 
+# list_amphibians <- vector(mode = "list", length = length(amphibians_string))
+# 
+# for(i in seq_along(amphibians_string)){
+#   
+#   list_amphibians[[i]] <- read_csv(paste0("C:/Users/carlo/OneDrive/Desktop/niche_position2/biomes2/AMPHIBIA/",
+#                                      amphibians_string[i]))
+#   
+# }
+# 
+# ######## marginality ############
+# amphibians_results <- do.call("rbind", list_amphibians)
+# 
+# amphibians_results$class <- "amphibians"
+# 
+# 
+# ##marginality
+# amphibians_marg <- amphibians_results %>% filter(variable == "marginality") %>% 
+#   mutate(term = str_replace(term, "^log\\(.*\\)$", "Beta")) %>% 
+#   filter(term == "Beta") %>% 
+#   dplyr::rename(p_value = `Pr(>|t|)`)
+# 
+# amphibians_marg$ext <- factor(amphibians_marg$ext, levels = c("low",
+#                                                     "int",
+#                                                     "high"),
+#                          ordered = TRUE)
+# 
+# 
+# #write
+# write_csv(amphibians_marg, file = "results/data/processed/biomes/amphibians_marg_biomes.csv")
+
+#read
+amphibians_marg_biomes <- read_csv("results/data/processed/biomes/amphibians_marg_biomes.csv")
+
+
+##summarizing
+sum_amphibians_marg <- amphibians_marg_biomes %>% group_by(biome, ext) %>% 
+  summarize(
+    mean_B = mean(Estimate),
+    median_B = median(Estimate),
+    CI_lower_B = quantile(Estimate, 0.025),
+    CI_upper_B = quantile(Estimate, 0.975),
+    mean_p = mean(p_value),
+    median_p = median(p_value),
+    CI_lower_p = quantile(p_value, 0.025),
+    CI_upper_p = quantile(p_value, 0.975),
+    prop_significant = mean(p_value < 0.05),
+    mean_R = mean(adj.r.squared),
+    median_R = median(adj.r.squared),
+    CI_lower_R = quantile(adj.r.squared, 0.025),
+    CI_upper_R = quantile(adj.r.squared, 0.975),
+    mean_lambda = mean(lambda),
+    median_lambda = median(lambda),
+    CI_lower_lambda = mean(lam_low),
+    CI_upper_lambda = mean(lam_up))
+
+sum_amphibians_marg$class <- "amphibians"
+
+sum_amphibians_marg$variable <- "marginality"
+
+
+########### specialization #######################
+
+# amphibians_spe <- amphibians_results %>% filter(variable == "specialization") %>% 
+#   mutate(term = str_replace(term, "^log\\(.*\\)$", "Beta")) %>% 
+#   filter(term == "Beta") %>% 
+#   dplyr::rename(p_value = `Pr(>|t|)`)
+# 
+# amphibians_spe$ext <- factor(amphibians_spe$ext, levels = c("low",
+#                                                   "int",
+#                                                   "high"),
+#                         ordered = TRUE)
+# 
+# #write
+# write_csv(amphibians_spe, file = "results/data/processed/biomes/amphibians_spe_biomes.csv")
+
+#read
+amphibians_spe_biomes <- read_csv("results/data/processed/biomes/amphibians_spe_biomes.csv")
+
+
+##summarizing
+sum_amphibians_spe <- amphibians_spe %>% group_by(biome, ext) %>% 
+  summarize(
+    mean_B = mean(Estimate),
+    median_B = median(Estimate),
+    CI_lower_B = quantile(Estimate, 0.025),
+    CI_upper_B = quantile(Estimate, 0.975),
+    mean_p = mean(p_value),
+    median_p = median(p_value),
+    CI_lower_p = quantile(p_value, 0.025),
+    CI_upper_p = quantile(p_value, 0.975),
+    prop_significant = mean(p_value < 0.05),
+    mean_R = mean(adj.r.squared),
+    median_R = median(adj.r.squared),
+    CI_lower_R = quantile(adj.r.squared, 0.025),
+    CI_upper_R = quantile(adj.r.squared, 0.975),
+    mean_lambda = mean(lambda),
+    median_lambda = median(lambda),
+    CI_lower_lambda = mean(lam_low),
+    CI_upper_lambda = mean(lam_up))
+
+sum_amphibians_spe$class <- "amphibians"
+
+sum_amphibians_spe$variable <- "specialization"
+
+
+# general summaries -------------------------------------------------------
+
+
+###############marginality###########
+
+sum_biomes_marg <- rbind(sum_mam_marg, sum_birds_marg, sum_reptiles_marg,
+                         sum_amphibians_marg)
+
+
+#biomes 
+biomes <- unique(sum_biomes_marg$biome)  
+
+sum_biomes_marg$biome <- factor(sum_biomes_marg$biome, labels = c("Deserts and xeric shrublands",
+                                                                  "Flooded grasslands and savannas",
+                                                                  "Mediterranean forests woodlands and scrub",
+                                                                  "Montane grasslands and shrublands",
+                                                                  "Temperate broadleaf & mixed forests",
+                                                                  "Temperate grasslands savannas and shrublands",
+                                                                  "Tropical & subtropical coniferous forests",
+                                                                  "Tropical & subtropical dry broadleaf forests",
+                                                                  "Tropical & subtropical grasslands savannas and shrublands",
+                                                                  "Tropical & subtropical moist broadleaf forests",
+                                                                  "Mangroves"))
+write_csv(sum_biomes_marg, file = "results/data/processed/biomes/marginality/sum_biomes_marg.csv")
+
+##significant table, intermediate extinction and the proportion of significant pvalues equal or above 0.5
+sum_biomes_marg_sig <- sum_biomes_marg %>% filter(ext == "high",
+                                                  prop_significant >= 0.5) %>% 
+  mutate(significance_level = case_when(
+    prop_significant >= 0.95 ~ "Strict (≥95%)",
+    prop_significant >= 0.80 ~ "Moderate (≥80%)",
+    prop_significant >= 0.50 ~ "Lenient (≥50%)"))
+
+
+
+
+
+write_xlsx(sum_biomes_marg_sig, path = "results/data/processed/biomes/marginality/sum_biomes_sig.xlsx")
+
+
+#########specialization##########
+sum_biomes_spe <- rbind(sum_mam_spe, sum_birds_spe, sum_reptiles_spe,
+                        sum_amphibians_spe)
+
+
+#biomes 
+biomes <- unique(sum_biomes_spe$biome)  
+
+sum_biomes_spe$biome <- factor(sum_biomes_spe$biome, labels = c("Deserts and xeric shrublands",
+                                                                "Flooded grasslands and savannas",
+                                                                "Mediterranean forests woodlands and scrub",
+                                                                "Montane grasslands and shrublands",
+                                                                "Temperate broadleaf & mixed forests",
+                                                                "Temperate grasslands savannas and shrublands",
+                                                                "Tropical & subtropical coniferous forests",
+                                                                "Tropical & subtropical dry broadleaf forests",
+                                                                "Tropical & subtropical grasslands savannas and shrublands",
+                                                                "Tropical & subtropical moist broadleaf forests",
+                                                                "Mangroves"))
+write_csv(sum_biomes_spe, file = "results/data/processed/biomes/specialization/sum_biomes_spe.csv")
+
+##significant table, intermediate extinction and the proportion of significant pvalues equal or above 0.5
+sum_biomes_spe_sig <- sum_biomes_spe %>% filter(ext == "high",
+                                                prop_significant >= 0.5) %>% 
+  mutate(significance_level = case_when(
+    prop_significant >= 0.95 ~ "Strict (≥95%)",
+    prop_significant >= 0.80 ~ "Moderate (≥80%)",
+    prop_significant >= 0.50 ~ "Lenient (≥50%)"
+  ))
+
+
+write_xlsx(sum_biomes_spe_sig, path = "results/data/processed/biomes/specialization/sum_biomes_sig.xlsx")
+
+
+#########plots as error bars for the beta #############
+
+#binding significative results
+
+df <- rbind(sum_biomes_marg_sig, sum_biomes_spe_sig)
+
+
+
+# Convert significance to factor for proper ordering in legend
+df$significance_level <- factor(df$significance_level, 
+                                levels = c("Strict (≥95%)", "Moderate (≥80%)", 
+                                           "Lenient (≥50%)"))
+
+
+#ordering factors for ploting
+df$biome <- factor(df$biome, levels = c(
+  "Deserts and xeric shrublands",
+  "Mediterranean forests woodlands and scrub",
+  "Temperate broadleaf & mixed forests",
+  "Flooded grasslands and savannas",
+  "Tropical & subtropical grasslands savannas and shrublands",
+  "Tropical & subtropical coniferous forests",
+  "Mangroves",
+  "Tropical & subtropical moist broadleaf forests"))
+
+#breaking the biomes text in the figure
+df$biome <- str_wrap(df$biome, width = 25)
+
+df$class <- factor(df$class, levels = c("reptiles","birds","mammals" ))
+
+# Define custom colors for classes
+class_colors <- c(
+  "birds" = "#E69F00",   # Strong golden yellow
+  
+  "reptiles" = "#018571" # Strong teal green
+)
+
+##principal result
+png("text/figures/biomes_CI_high.png", 
+    width = 30, height = 20,
+    units = "cm", pointsize = 8, res = 300)
+
+
+ggplot(df, aes(x = biome, y = median_B, color = class,
+               shape = significance_level)) +
+  geom_point(size = 5.5, position = position_dodge(width = 1)) +  # Points for median_B
+  geom_errorbar(aes(ymin = CI_lower_B, ymax = CI_upper_B), 
+                width = 0.4, position = position_dodge(width = 1)) +  # Error bars
   theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle= 90, size = 12,
-                                    face = "bold"))
-        
+  labs(x = NULL, y = "Beta", color = "Class") +
+  ylim(-0.45, 0.45) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black", size = 0.75) +
+  coord_flip() +
+  facet_wrap(~variable, labeller = as_labeller(c(
+    marginality = "Marginality",
+    specialization = "Specialization"
+  ))) +
+  scale_color_manual(values = class_colors, 
+                     guide = "none") +
+  scale_shape_manual(values = c(
+    "Strict (≥95%)" = 16,    # Solid Circle
+    "Moderate (≥80%)" = 17,  # Triangle
+    "Lenient (≥50%)" = 15    # Square
+  ), name = NULL) +
+  
+  mynamestheme +
+  theme(
+    panel.background = element_rect(fill = "gray98"),  # Light gray background
+    panel.grid.major.y = element_line(color = "grey49",
+                                      size = 0.75),
+    panel.grid.major.x = element_blank(),# Subtle grid for reference
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(size = 16),  # Increase x-axis text size
+    axis.text.y = element_text(size = 15),
+    axis.title.x = element_text(size = 17),
+    strip.text = element_text(size = 16),
+    legend.background = element_rect(fill = "white", color = "white"),
+    legend.text = element_text(size = 14),
+    legend.position = "bottom")
+
 
 dev.off()
 
 
-#################################Intermediate extinction ######################
+####################supplementary#######################
 
 
-biomes_sig_marg_birds <- sig_marg_res %>% filter(class == "AVES",
-                                                 ext == "int") %>%
-                                        pull(biome) %>% unique()
+## Intermediate extinction 
+
+##significant table, intermediate extinction and the proportion of significant pvalues equal or above 0.5
+sum_biomes_marg_sig <- sum_biomes_marg %>% filter(ext == "int",
+                                                  prop_significant >= 0.5) %>% 
+  mutate(significance_level = case_when(
+    prop_significant >= 0.95 ~ "Strict (≥95%)",
+    prop_significant >= 0.80 ~ "Moderate (≥80%)",
+    prop_significant >= 0.50 ~ "Lenient (≥50%)"
+  ))
 
 
-##pivoting
-vert_pivot_birds <- vert_enfa_ages %>% filter(className == "AVES",
-                                              biome %in% biomes_sig_marg_birds) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_birds$ext_age <- factor(vert_pivot_birds$ext_age, 
-                                   levels = c("low.age",
-                                              "int.age",
-                                              "high.age"),
-                                   ordered = TRUE)
-
-vert_pivot_birds$className <- factor(vert_pivot_birds$className,
-                                     levels = c("AVES"),
-                                     labels = c("Birds"
-                                     ),
-                                     ordered = TRUE)
-vert_pivot_birds$biome <- factor(vert_pivot_birds$biome,
-                                 levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                            "Tropical_&_subtropical_dry_broadleaf_forests",
-                                            "Tropical_&_subtropical_coniferous_forests",
-                                            "Tropical_&_subtropical_grasslands_savannas_and_shrublands",
-                                            "Deserts_and_xeric_shrublands"),
-                                 labels = c("Tropical & subtropical moist broadleaf forests",
-                                            "Tropical & subtropical dry broadleaf forests",
-                                            "Tropical & subtropical coniferous forests",
-                                            "Tropical & subtropical grasslands savannas and shrublands",
-                                            "Deserts and xeric shrublands"),
-                                 ordered = TRUE)
+sum_biomes_spe_sig <- sum_biomes_spe %>% filter(ext == "int",
+                                                prop_significant >= 0.5) %>% 
+  mutate(significance_level = case_when(
+    prop_significant >= 0.95 ~ "Strict (≥95%)",
+    prop_significant >= 0.80 ~ "Moderate (≥80%)",
+    prop_significant >= 0.50 ~ "Lenient (≥50%)"
+  ))
 
 
-## df elements of models
-ele_marg_birds <- biome_marg_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "AVES",
-         biome %in% biomes_sig_marg_birds) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
 
-##changing factors name for matching with vert_enfa
-ele_marg_birds$className <- factor(ele_marg_birds$className, levels = c("AVES"),
-                                   labels = c("Birds"))
-
-##Int extinction scenario
-ele_marg_birds_int <- ele_marg_birds %>% filter(ext == "int")
-
-##Biomes
-ele_marg_birds_int$biome <- factor(ele_marg_birds_int$biome,
-                                    levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                               "Tropical_&_subtropical_dry_broadleaf_forests",
-                                               "Tropical_&_subtropical_coniferous_forests",
-                                               "Tropical_&_subtropical_grasslands_savannas_and_shrublands",
-                                               "Deserts_and_xeric_shrublands"),
-                                    labels = c("Tropical & subtropical moist broadleaf forests",
-                                               "Tropical & subtropical dry broadleaf forests",
-                                               "Tropical & subtropical coniferous forests",
-                                               "Tropical & subtropical grasslands savannas and shrublands",
-                                               "Deserts and xeric shrublands"),
-                                    ordered = TRUE)
-
-png("text/figures/marginality/biomes/bird_model_int.png",
-    width = 50, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
+df <- rbind(sum_biomes_marg_sig, sum_biomes_spe_sig)
 
 
-plot.birds.int.marg <- vert_pivot_birds %>% filter(ext_age == "int.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(marginality+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Marginality")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_marg_birds_int, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
+
+# Convert significance to factor for proper ordering in legend
+df$significance_level <- factor(df$significance_level, 
+                                levels = c("Strict (≥95%)", "Moderate (≥80%)", 
+                                           "Lenient (≥50%)"))
+
+
+#ordering factors for ploting
+df$biome <- factor(df$biome, levels = c(
+  "Deserts and xeric shrublands",
+  "Mediterranean forests woodlands and scrub",
+  "Temperate broadleaf & mixed forests",
+  "Flooded grasslands and savannas",
+  "Tropical & subtropical grasslands savannas and shrublands",
+  "Tropical & subtropical coniferous forests",
+  "Mangroves",
+  "Tropical & subtropical moist broadleaf forests"))
+
+#breaking the biomes text in the figure
+df$biome <- str_wrap(df$biome, width = 25)
+
+df$class <- factor(df$class, levels = c("reptiles","birds","mammals" ))
+
+# Define custom colors for classes
+class_colors <- c(
+  "birds" = "#E69F00",   # Strong golden yellow
+  "mammals" = "#E66101", # Deep orange
+  "reptiles" = "#018571" # Strong teal green
+)
+
+##principal result
+png("text/figures/Sup/biomes_CI_int.png", 
+    width = 30, height = 20,
+    units = "cm", pointsize = 8, res = 300)
+
+
+ggplot(df, aes(x = biome, y = median_B, color = class,
+               shape = significance_level)) +
+  geom_point(size = 5.5, position = position_dodge(width = 1)) +  # Points for median_B
+  geom_errorbar(aes(ymin = CI_lower_B, ymax = CI_upper_B), 
+                width = 0.4, position = position_dodge(width = 1)) +  # Error bars
   theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle= 90, size = 12,
-                                    face = "bold"))
-
+  labs(x = NULL, y = "Beta", color = "Class") +
+  ylim(-0.45, 0.45) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  coord_flip() +
+  facet_wrap(~variable, labeller = as_labeller(c(
+    marginality = "Marginality",
+    specialization = "Specialization"
+  ))) +
+  scale_color_manual(values = class_colors, 
+                     guide = "none") +
+  scale_shape_manual(values = c(
+    "Strict (≥95%)" = 16,    # Solid Circle
+    "Moderate (≥80%)" = 17,  # Triangle
+    "Lenient (≥50%)" = 15    # Square
+  ), name = NULL) +
+  mynamestheme +
+  theme(
+    panel.background = element_rect(fill = "gray98"),  # Light gray background
+    panel.grid.major = element_line(color = "gray90"), # Subtle grid for reference
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(size = 16),  # Increase x-axis text size
+    axis.text.y = element_text(size = 15),
+    axis.title.x = element_text(size = 17),
+    legend.background = element_rect(fill = "white", color = "white"),
+    legend.text = element_text(size = 14) )
 
 dev.off()
 
-#############Low extinction###########################
 
-biomes_sig_marg_birds <- sig_marg_res %>% filter(class == "AVES") %>%
-  pull(biome) %>% unique()
+## Low extinction 
 
-
-##pivoting
-vert_pivot_birds <- vert_enfa_ages %>% filter(className == "AVES",
-                                              biome %in% biomes_sig_marg_birds) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_birds$ext_age <- factor(vert_pivot_birds$ext_age, 
-                                   levels = c("low.age",
-                                              "int.age",
-                                              "high.age"),
-                                   ordered = TRUE)
-
-vert_pivot_birds$className <- factor(vert_pivot_birds$className,
-                                     levels = c("AVES"),
-                                     labels = c("Birds"
-                                     ),
-                                     ordered = TRUE)
-vert_pivot_birds$biome <- factor(vert_pivot_birds$biome,
-                                 levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                            "Tropical_&_subtropical_dry_broadleaf_forests",
-                                            "Tropical_&_subtropical_coniferous_forests",
-                                            "Tropical_&_subtropical_grasslands_savannas_and_shrublands",
-                                            "Deserts_and_xeric_shrublands"),
-                                 labels = c("Tropical & subtropical moist broadleaf forests",
-                                            "Tropical & subtropical dry broadleaf forests",
-                                            "Tropical & subtropical coniferous forests",
-                                            "Tropical & subtropical grasslands savannas and shrublands",
-                                            "Deserts and xeric shrublands"),
-                                 ordered = TRUE)
+##significant table, intermediate extinction and the proportion of significant pvalues equal or above 0.5
+sum_biomes_marg_sig <- sum_biomes_marg %>% filter(ext == "low",
+                                                  prop_significant >= 0.5) %>% 
+  mutate(significance_level = case_when(
+    prop_significant >= 0.95 ~ "Strict (≥95%)",
+    prop_significant >= 0.80 ~ "Moderate (≥80%)",
+    prop_significant >= 0.50 ~ "Lenient (≥50%)"
+  ))
 
 
-## df elements of models
-ele_marg_birds <- biome_marg_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "AVES",
-         biome %in% biomes_sig_marg_birds) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_marg_birds$className <- factor(ele_marg_birds$className, levels = c("AVES"),
-                                   labels = c("Birds"))
-
-##low extinciton scenario
-ele_marg_birds_low <- ele_marg_birds %>% filter(ext == "low")
-
-##Biomes
-ele_marg_birds_low$biome <- factor(ele_marg_birds_low$biome,
-                                    levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                               "Tropical_&_subtropical_dry_broadleaf_forests",
-                                               "Tropical_&_subtropical_coniferous_forests",
-                                               "Tropical_&_subtropical_grasslands_savannas_and_shrublands",
-                                               "Deserts_and_xeric_shrublands"),
-                                    labels = c("Tropical & subtropical moist broadleaf forests",
-                                               "Tropical & subtropical dry broadleaf forests",
-                                               "Tropical & subtropical coniferous forests",
-                                               "Tropical & subtropical grasslands savannas and shrublands",
-                                               "Deserts and xeric shrublands"),
-                                    ordered = TRUE)
-
-png("text/figures/marginality/biomes/bird_model_low.png",
-    width = 50, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
+sum_biomes_spe_sig <- sum_biomes_spe %>% filter(ext == "low",
+                                                prop_significant >= 0.5) %>% 
+  mutate(significance_level = case_when(
+    prop_significant >= 0.95 ~ "Strict (≥95%)",
+    prop_significant >= 0.80 ~ "Moderate (≥80%)",
+    prop_significant >= 0.50 ~ "Lenient (≥50%)"
+  ))
 
 
-plot.birds.low.marg <- vert_pivot_birds %>% filter(ext_age == "low.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(marginality+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Marginality")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_marg_birds_low, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
+
+df <- rbind(sum_biomes_marg_sig, sum_biomes_spe_sig)
+
+
+
+# Convert significance to factor for proper ordering in legend
+df$significance_level <- factor(df$significance_level, 
+                                levels = c("Strict (≥95%)", "Moderate (≥80%)", 
+                                           "Lenient (≥50%)"))
+
+
+#ordering factors for ploting
+df$biome <- factor(df$biome, levels = c(
+  "Deserts and xeric shrublands",
+  "Mediterranean forests woodlands and scrub",
+  "Temperate broadleaf & mixed forests",
+  "Flooded grasslands and savannas",
+  "Tropical & subtropical grasslands savannas and shrublands",
+  "Tropical & subtropical coniferous forests",
+  "Mangroves",
+  "Tropical & subtropical moist broadleaf forests"))
+
+#breaking the biomes text in the figure
+df$biome <- str_wrap(df$biome, width = 25)
+
+df$class <- factor(df$class, levels = c("amphibians","reptiles","birds","mammals" ))
+
+# Define custom colors for classes
+class_colors <- c(
+  "birds" = "#E69F00",   # Strong golden yellow
+  "mammals" = "#E66101", # Deep orange
+  "reptiles" = "#018571", # Strong teal green
+  "amphibians" = "#7fbf7b"
+)
+
+##principal result
+png("text/figures/Sup/biomes_CI_low.png", 
+    width = 30, height = 20,
+    units = "cm", pointsize = 8, res = 300)
+
+ggplot(df, aes(x = biome, y = median_B, color = class,
+               shape = significance_level)) +
+  geom_point(size = 5.5, position = position_dodge(width = 1)) +  # Points for median_B
+  geom_errorbar(aes(ymin = CI_lower_B, ymax = CI_upper_B), 
+                width = 0.4, position = position_dodge(width = 1)) +  # Error bars
   theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle= 90, size = 12,
-                                    face = "bold"))
+  labs(x = NULL, y = "Beta", color = "Class") +
+  ylim(-0.45, 0.45) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  coord_flip() +
+  facet_wrap(~variable, labeller = as_labeller(c(
+    marginality = "Marginality",
+    specialization = "Specialization"
+  ))) +
+  scale_color_manual(values = class_colors, 
+                     guide = "none") +
+  scale_shape_manual(values = c(
+    "Strict (≥95%)" = 16,    # Solid Circle
+    "Moderate (≥80%)" = 17,  # Triangle
+    "Lenient (≥50%)" = 15    # Square
+  ), name = NULL) +
+  mynamestheme +
+  theme(
+    panel.background = element_rect(fill = "gray98"),  # Light gray background
+    panel.grid.major = element_line(color = "gray90"), # Subtle grid for reference
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(size = 16),  # Increase x-axis text size
+    axis.text.y = element_text(size = 15),
+    axis.title.x = element_text(size = 17),
+    legend.background = element_rect(fill = "white", color = "white"),
+    legend.text = element_text(size = 14) )
 
 
-dev.off()
-
-
-
-
-# Reptiles ----------------------------------------------------------------
-
-
-#########High extinction###########################
-biomes_sig_marg_rep <- sig_marg_res %>% filter(class == "REPTILIA") %>%
-                                              pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_reptiles <- vert_enfa_ages %>% filter(className == "REPTILIA",
-                                        biome %in% biomes_sig_marg_rep) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_reptiles$ext_age <- factor(vert_pivot_reptiles$ext_age, 
-                             levels = c("low.age",
-                                        "int.age",
-                                        "high.age"),
-                             ordered = TRUE)
-
-vert_pivot_reptiles$className <- factor(vert_pivot_reptiles$className,
-                               levels = c("REPTILIA"),
-                               labels = c("Reptiles"
-                               ),
-                               ordered = TRUE)
-vert_pivot_reptiles$biome <- factor(vert_pivot_reptiles$biome,
-                           levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                      "Tropical_&_subtropical_dry_broadleaf_forests"),
-                           labels = c("Tropical & subtropical moist broadleaf forests",
-                                      "Tropical & subtropical dry broadleaf forests"),
-                           ordered = TRUE)
-
-
-## df elements of models
-ele_marg_reptiles <- biome_marg_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "REPTILIA",
-         biome %in% biomes_sig_marg_rep) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_marg_reptiles$className <- factor(ele_marg_reptiles$className, levels = c("REPTILIA"),
-                                   labels = c("Reptiles"))
-
-##High extinciton scenario
-ele_marg_reptiles_high <- ele_marg_reptiles %>% filter(ext == "high")
-
-##Biomes
-ele_marg_reptiles_high$biome <- factor(ele_marg_reptiles_high$biome,
-                                   levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                              "Tropical_&_subtropical_dry_broadleaf_forests"),
-                                   labels = c("Tropical & subtropical moist broadleaf forests",
-                                              "Tropical & subtropical dry broadleaf forests"),
-                                   ordered = TRUE)
-
-
-png("text/figures/marginality/biomes/reptile_model.png",
-    width = 20, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-
-plot.reptiles.high.marg <- vert_pivot_reptiles %>% filter(ext_age == "high.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(marginality+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Marginality")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_marg_reptiles_high, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
-  theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle= 90, size = 12,
-                                    face = "bold"))
-
-
-dev.off()
-
-
-
-#############################intermediate extinction#########################
-biomes_sig_marg_rep <- sig_marg_res %>% filter(class == "REPTILIA",
-                                               ext == "int") %>%
-  pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_reptiles <- vert_enfa_ages %>% filter(className == "REPTILIA",
-                                                 biome %in% biomes_sig_marg_rep) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_reptiles$ext_age <- factor(vert_pivot_reptiles$ext_age, 
-                                      levels = c("low.age",
-                                                 "int.age",
-                                                 "high.age"),
-                                      ordered = TRUE)
-
-vert_pivot_reptiles$className <- factor(vert_pivot_reptiles$className,
-                                        levels = c("REPTILIA"),
-                                        labels = c("Reptiles"
-                                        ),
-                                        ordered = TRUE)
-vert_pivot_reptiles$biome <- factor(vert_pivot_reptiles$biome,
-                                    levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                               "Tropical_&_subtropical_dry_broadleaf_forests"),
-                                    labels = c("Tropical & subtropical moist broadleaf forests",
-                                               "Tropical & subtropical dry broadleaf forests"),
-                                    ordered = TRUE)
-
-
-## df elements of models
-ele_marg_reptiles <- biome_marg_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "REPTILIA",
-         biome %in% biomes_sig_marg_rep) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_marg_reptiles$className <- factor(ele_marg_reptiles$className, levels = c("REPTILIA"),
-                                      labels = c("Reptiles"))
-
-##int extinciton scenario
-ele_marg_reptiles_int <- ele_marg_reptiles %>% filter(ext == "int")
-
-##Biomes
-ele_marg_reptiles_int$biome <- factor(ele_marg_reptiles_int$biome,
-                                       levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                                  "Tropical_&_subtropical_dry_broadleaf_forests"),
-                                       labels = c("Tropical & subtropical moist broadleaf forests",
-                                                  "Tropical & subtropical dry broadleaf forests"),
-                                       ordered = TRUE)
-
-
-png("text/figures/marginality/biomes/reptile_model_int.png",
-    width = 20, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-
-plot.reptiles.int.marg <- vert_pivot_reptiles %>% filter(ext_age == "int.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(marginality+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Marginality")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_marg_reptiles_int, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
-  theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle= 90, size = 12,
-                                    face = "bold"))
-
-
-dev.off()
-
-####################Low extinction###################################
-biomes_sig_marg_rep <- sig_marg_res %>% filter(class == "REPTILIA",
-                                               ext == "low") %>%
-  pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_reptiles <- vert_enfa_ages %>% filter(className == "REPTILIA",
-                                                 biome %in% biomes_sig_marg_rep) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_reptiles$ext_age <- factor(vert_pivot_reptiles$ext_age, 
-                                      levels = c("low.age",
-                                                 "int.age",
-                                                 "high.age"),
-                                      ordered = TRUE)
-
-vert_pivot_reptiles$className <- factor(vert_pivot_reptiles$className,
-                                        levels = c("REPTILIA"),
-                                        labels = c("Reptiles"
-                                        ),
-                                        ordered = TRUE)
-vert_pivot_reptiles$biome <- factor(vert_pivot_reptiles$biome,
-                                    levels = c("Tropical_&_subtropical_moist_broadleaf_forests"),
-                                    labels = c("Tropical & subtropical moist broadleaf forests"),
-                                    ordered = TRUE)
-
-
-## df elements of models
-ele_marg_reptiles <- biome_marg_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "REPTILIA",
-         biome %in% biomes_sig_marg_rep) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_marg_reptiles$className <- factor(ele_marg_reptiles$className, levels = c("REPTILIA"),
-                                      labels = c("Reptiles"))
-
-##low extinciton scenario
-ele_marg_reptiles_low <- ele_marg_reptiles %>% filter(ext == "low")
-
-##Biomes
-ele_marg_reptiles_low$biome <- factor(ele_marg_reptiles_low$biome,
-                                       levels = c("Tropical_&_subtropical_moist_broadleaf_forests"
-                                                  ),
-                                       labels = c("Tropical & subtropical moist broadleaf forests"),
-                                       ordered = TRUE)
-
-
-png("text/figures/marginality/biomes/reptile_model_low.png",
-    width = 10, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-
-plot.reptiles.low.marg <- vert_pivot_reptiles %>% filter(ext_age == "low.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(marginality+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Marginality")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_marg_reptiles_low, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
-  theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle= 90, size = 12,
-                                    face = "bold"))
-
-
-dev.off()
-
-
-
-
-# amphibians --------------------------------------------------------------
-
-
-#########high extinction#########################################
-biomes_sig_marg_amphibians <- sig_marg_res %>%
-                     filter(class == "AMPHIBIA") %>% pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_amphibians <- vert_enfa_ages %>% filter(className == "AMPHIBIA",
-                                                 biome %in% biomes_sig_marg_amphibians) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_amphibians$ext_age <- factor(vert_pivot_amphibians$ext_age, 
-                                      levels = c("low.age",
-                                                 "int.age",
-                                                 "high.age"),
-                                      ordered = TRUE)
-
-vert_pivot_amphibians$className <- factor(vert_pivot_amphibians$className,
-                                        levels = c("AMPHIBIA"),
-                                        labels = c("Amphibians"
-                                        ),
-                                        ordered = TRUE)
-vert_pivot_amphibians$biome <- factor(vert_pivot_amphibians$biome,
-                                    levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                               "Temperate_grasslands_savannas_and_ shrublands",
-                                               "Mediterranean_forests_woodlands_and_scrub"),
-                                    labels = c("Tropical & subtropical moist broadleaf forests",
-                                               "Temperate grasslands savannas and shrublands",
-                                               "Mediterranean forests woodlands and scrub"),
-                                    ordered = TRUE)
-
-
-## df elements of models
-ele_marg_amphibians <- biome_marg_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "AMPHIBIA",
-         biome %in% biomes_sig_marg_amphibians) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_marg_amphibians$className <- factor(ele_marg_amphibians$className, levels = c("AMPHIBIA"),
-                                      labels = c("Amphibians"))
-
-##High extinciton scenario
-ele_marg_amphibians_high <- ele_marg_amphibians %>% filter(ext == "high")
-
-##Biomes
-ele_marg_amphibians_high$biome <- factor(ele_marg_amphibians_high$biome,
-                                         levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                                    "Temperate_grasslands_savannas_and_ shrublands",
-                                                    "Mediterranean_forests_woodlands_and_scrub"),
-                                         labels = c("Tropical & subtropical moist broadleaf forests",
-                                                    "Temperate grasslands savannas and shrublands",
-                                                    "Mediterranean forests woodlands and scrub" ),
-                                         ordered = TRUE)
-
-
-png("text/figures/marginality/biomes/amphibians_model.png",
-    width = 30, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-
-plot.amphibians.high.marg <- vert_pivot_amphibians %>% filter(ext_age == "high.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(marginality+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Marginality")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_marg_amphibians_high, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
-  theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle=0, size = 12,
-                                    face = "bold"))
-
-dev.off()
-
-############intermediate extinction########################
-biomes_sig_marg_amphibians <- sig_marg_res %>%
-  filter(class == "AMPHIBIA") %>% pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_amphibians <- vert_enfa_ages %>% filter(className == "AMPHIBIA",
-                                                   biome %in% biomes_sig_marg_amphibians) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_amphibians$ext_age <- factor(vert_pivot_amphibians$ext_age, 
-                                        levels = c("low.age",
-                                                   "int.age",
-                                                   "high.age"),
-                                        ordered = TRUE)
-
-vert_pivot_amphibians$className <- factor(vert_pivot_amphibians$className,
-                                          levels = c("AMPHIBIA"),
-                                          labels = c("Amphibians"
-                                          ),
-                                          ordered = TRUE)
-vert_pivot_amphibians$biome <- factor(vert_pivot_amphibians$biome,
-                                      levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                                 "Temperate_grasslands_savannas_and_ shrublands",
-                                                 "Mediterranean_forests_woodlands_and_scrub"),
-                                      labels = c("Tropical & subtropical moist broadleaf forests",
-                                                 "Temperate grasslands savannas and shrublands",
-                                                 "Mediterranean forests woodlands and scrub"),
-                                      ordered = TRUE)
-
-
-## df elements of models
-ele_marg_amphibians <- biome_marg_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "AMPHIBIA",
-         biome %in% biomes_sig_marg_amphibians) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_marg_amphibians$className <- factor(ele_marg_amphibians$className, levels = c("AMPHIBIA"),
-                                        labels = c("Amphibians"))
-
-##int extinciton scenario
-ele_marg_amphibians_int <- ele_marg_amphibians %>% filter(ext == "int")
-
-##Biomes
-ele_marg_amphibians_int$biome <- factor(ele_marg_amphibians_int$biome,
-                                         levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                                    "Temperate_grasslands_savannas_and_ shrublands",
-                                                    "Mediterranean_forests_woodlands_and_scrub"),
-                                         labels = c("Tropical & subtropical moist broadleaf forests",
-                                                    "Temperate grasslands savannas and shrublands",
-                                                    "Mediterranean forests woodlands and scrub" ),
-                                         ordered = TRUE)
-
-
-png("text/figures/marginality/biomes/amphibians_model_int.png",
-    width = 30, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-
-plot.amphibians.int.marg <- vert_pivot_amphibians %>% filter(ext_age == "int.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(marginality+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Marginality")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_marg_amphibians_int, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
-  theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle=0, size = 12,
-                                    face = "bold"))
-
-dev.off()
-
-
-#################Low extinction###################
-
-biomes_sig_marg_amphibians <- sig_marg_res %>%
-  filter(class == "AMPHIBIA") %>% pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_amphibians <- vert_enfa_ages %>% filter(className == "AMPHIBIA",
-                                                   biome %in% biomes_sig_marg_amphibians) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_amphibians$ext_age <- factor(vert_pivot_amphibians$ext_age, 
-                                        levels = c("low.age",
-                                                   "int.age",
-                                                   "high.age"),
-                                        ordered = TRUE)
-
-vert_pivot_amphibians$className <- factor(vert_pivot_amphibians$className,
-                                          levels = c("AMPHIBIA"),
-                                          labels = c("Amphibians"
-                                          ),
-                                          ordered = TRUE)
-vert_pivot_amphibians$biome <- factor(vert_pivot_amphibians$biome,
-                                      levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                                 "Temperate_grasslands_savannas_and_ shrublands",
-                                                 "Mediterranean_forests_woodlands_and_scrub"),
-                                      labels = c("Tropical & subtropical moist broadleaf forests",
-                                                 "Temperate grasslands savannas and shrublands",
-                                                 "Mediterranean forests woodlands and scrub"),
-                                      ordered = TRUE)
-
-
-## df elements of models
-ele_marg_amphibians <- biome_marg_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "AMPHIBIA",
-         biome %in% biomes_sig_marg_amphibians) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_marg_amphibians$className <- factor(ele_marg_amphibians$className, levels = c("AMPHIBIA"),
-                                        labels = c("Amphibians"))
-
-##low extinciton scenario
-ele_marg_amphibians_low <- ele_marg_amphibians %>% filter(ext == "low")
-
-##Biomes
-ele_marg_amphibians_low$biome <- factor(ele_marg_amphibians_low$biome,
-                                         levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                                    "Temperate_grasslands_savannas_and_ shrublands",
-                                                    "Mediterranean_forests_woodlands_and_scrub"),
-                                         labels = c("Tropical & subtropical moist broadleaf forests",
-                                                    "Temperate grasslands savannas and shrublands",
-                                                    "Mediterranean forests woodlands and scrub" ),
-                                         ordered = TRUE)
-
-
-png("text/figures/marginality/biomes/amphibians_model_low.png",
-    width = 30, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-
-plot.amphibians.low.marg <- vert_pivot_amphibians %>% filter(ext_age == "low.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(marginality+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Marginality")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_marg_amphibians_low, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
-  theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle=0, size = 12,
-                                    face = "bold"))
-
-dev.off()
-
-# beta --------------------------------------------------------------------
-
-#############high extinction#########################
-
-png("text/figures/marginality/biomes/beta_high.png",
-    width = 10, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
- beta_marg %>% filter(ext == "high") %>%
-  ggplot(aes(x = Estimate, fill = class ))+
-  geom_rect(aes(xmin = -Inf,
-                xmax = 0, 
-                ymin = -Inf,
-                ymax = +Inf),
-            fill = "#f0f0f0",
-            color = "#f0f0f0")+
-  geom_vline(xintercept = 0, color = "black", linewidth = 1,
-             linetype = "dashed")+
-  geom_histogram(color = "black", bins = 20) +
-  scale_fill_manual(name = NULL,
-                    labels = c("Birds", "Reptiles", "Amphibians"),
-                    values = c(
-                      "#fdae61",
-                      "#008837",
-                      "#a6dba0"))+
-  xlim(-0.5,0.5)+
-  xlab("Beta")+
-  ylab("Count")+
-  theme_classic()+
-  #scale_y_continuous(expand = c(0,0))+
-  mynamestheme
-
-
-
-
-dev.off()
-
-###########intermediate extinction#################
-png("text/figures/marginality/biomes/beta_int.png",
-    width = 10, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-beta_marg %>% filter(ext == "int") %>%
-  ggplot(aes(x = Estimate, fill = class ))+
-  geom_rect(aes(xmin = -Inf,
-                xmax = 0, 
-                ymin = -Inf,
-                ymax = +Inf),
-            fill = "#f0f0f0",
-            color = "#f0f0f0")+
-  geom_vline(xintercept = 0, color = "black", linewidth = 1,
-             linetype = "dashed")+
-  geom_histogram(color = "black", bins = 20) +
-  scale_fill_manual(name = NULL,
-                    labels = c( "Birds", "Reptiles", "Amphibians"),
-                    values = c(
-                      "#fdae61",
-                      "#008837",
-                      "#a6dba0"))+
-  xlim(-0.5, 0.5)+
-  xlab("Beta")+
-  ylab("Count")+
-  theme_classic()+
-  #scale_y_continuous(expand = c(0,0))+
-  mynamestheme
-
-
-dev.off()
-
-###low extinction
-png("text/figures/marginality/biomes/beta_low.png",
-    width = 10, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-beta_marg %>% filter(ext == "low") %>%
-  ggplot(aes(x = Estimate, fill = class ))+
-  geom_rect(aes(xmin = -Inf,
-                xmax = 0, 
-                ymin = -Inf,
-                ymax = +Inf),
-            fill = "#f0f0f0",
-            color = "#f0f0f0")+
-  geom_vline(xintercept = 0, color = "black", linewidth = 1,
-             linetype = "dashed")+
-  geom_histogram(color = "black", bins = 20) +
-  scale_fill_manual(name = NULL,
-                    labels = c( "Birds", "Reptiles", "Amphibians"),
-                    values = c(
-                      "#fdae61",
-                      "#008837",
-                      "#a6dba0"))+
-  xlim(-0.5,0.5)+
-  xlab("Beta")+
-  ylab("Count")+
-  theme_classic()+
-  #scale_y_continuous(expand = c(0,0))+
-  mynamestheme
-
-
-dev.off()
-
-
-# specialization ----------------------------------------------------------
-
-
-# mammals -------------------------------------------------------------------
-
-###########high extinction##############
-
-biomes_sig_spe_mammals <- sig_spe_res %>% filter(class == "MAMMALIA") %>% pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_mammals <- vert_enfa_ages %>% filter(className == "MAMMALIA",
-                                              biome %in% biomes_sig_spe_mammals) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_mammals$ext_age <- factor(vert_pivot_mammals$ext_age, 
-                                   levels = c("low.age",
-                                              "int.age",
-                                              "high.age"),
-                                   ordered = TRUE)
-
-vert_pivot_mammals$className <- factor(vert_pivot_mammals$className,
-                                     levels = c("MAMMALIA"),
-                                     labels = c("Mammals"
-                                     ),
-                                     ordered = TRUE)
-
-vert_pivot_mammals$biome <- factor(vert_pivot_mammals$biome,
-                                 levels = c("Tropical_&_subtropical_moist_broadleaf_forests"),
-                                 labels = c("Tropical & subtropical moist broadleaf forests"),
-                                 ordered = TRUE)
-
-
-## df elements of models
-ele_spe_mammals <- biome_spe_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "MAMMALIA",
-         biome %in% biomes_sig_spe_mammals) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_spe_mammals$className <- factor(ele_spe_mammals$className, levels = c("MAMMALIA"),
-                                   labels = c("Mammals"))
-
-##High extinciton scenario
-ele_spe_mammals_high <- ele_spe_mammals %>% filter(ext == "high")
-
-##Biomes
-ele_spe_mammals_high$biome <- factor(ele_spe_mammals_high$biome,
-                                    levels = c("Tropical_&_subtropical_moist_broadleaf_forests"),
-                                    labels = c("Tropical & subtropical moist broadleaf forests"),
-                                    ordered = TRUE)
-
-png("text/figures/specialization/biomes/mammals_model_high.png",
-    width = 10, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-
-plot.mammals.high.spe <- vert_pivot_mammals %>% filter(ext_age == "high.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(specialization+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Specialization")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_spe_mammals_high, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
-  theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle= 90, size = 14,
-                                    face = "bold"))
-
-
-dev.off()
-
-
-######################Intermediate########################
-###########high extinction##############
-
-biomes_sig_spe_mammals <- sig_spe_res %>% filter(class == "MAMMALIA",
-                                                 ext == "int") %>%
-                                         pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_mammals <- vert_enfa_ages %>% filter(className == "MAMMALIA",
-                                            biome %in% biomes_sig_spe_mammals) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_mammals$ext_age <- factor(vert_pivot_mammals$ext_age, 
-                                     levels = c("low.age",
-                                                "int.age",
-                                                "high.age"),
-                                     ordered = TRUE)
-
-vert_pivot_mammals$className <- factor(vert_pivot_mammals$className,
-                                       levels = c("MAMMALIA"),
-                                       labels = c("Mammals"
-                                       ),
-                                       ordered = TRUE)
-
-vert_pivot_mammals$biome <- factor(vert_pivot_mammals$biome,
-                                   levels = c("Tropical_&_subtropical_moist_broadleaf_forests"),
-                                   labels = c("Tropical & subtropical moist broadleaf forests"),
-                                   ordered = TRUE)
-
-
-## df elements of models
-ele_spe_mammals <- biome_spe_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "MAMMALIA",
-         biome %in% biomes_sig_spe_mammals) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_spe_mammals$className <- factor(ele_spe_mammals$className, levels = c("MAMMALIA"),
-                                    labels = c("Mammals"))
-
-##int extinciton scenario
-ele_spe_mammals_int <- ele_spe_mammals %>% filter(ext == "int")
-
-##Biomes
-ele_spe_mammals_int$biome <- factor(ele_spe_mammals_int$biome,
-                                     levels = c("Tropical_&_subtropical_moist_broadleaf_forests"),
-                                     labels = c("Tropical & subtropical moist broadleaf forests"),
-                                     ordered = TRUE)
-
-png("text/figures/specialization/biomes/mammals_model_int.png",
-    width = 10, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-
-plot.mammals.int.spe <- vert_pivot_mammals %>% filter(ext_age == "int.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(specialization+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Specialization")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_spe_mammals_int, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
-  theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle= 90, size = 14,
-                                    face = "bold"))
-
-
-dev.off()
-
-
-###########low extinction##############
-
-biomes_sig_spe_mammals <- sig_spe_res %>% filter(class == "MAMMALIA") %>%
-                                 pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_mammals <- vert_enfa_ages %>% filter(className == "MAMMALIA",
-                                                biome %in% biomes_sig_spe_mammals) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_mammals$ext_age <- factor(vert_pivot_mammals$ext_age, 
-                                     levels = c("low.age",
-                                                "int.age",
-                                                "high.age"),
-                                     ordered = TRUE)
-
-vert_pivot_mammals$className <- factor(vert_pivot_mammals$className,
-                                       levels = c("MAMMALIA"),
-                                       labels = c("Mammals"
-                                       ),
-                                       ordered = TRUE)
-
-vert_pivot_mammals$biome <- factor(vert_pivot_mammals$biome,
-                                   levels = c("Tropical_&_subtropical_moist_broadleaf_forests"),
-                                   labels = c("Tropical & subtropical moist broadleaf forests"),
-                                   ordered = TRUE)
-
-
-## df elements of models
-ele_spe_mammals <- biome_spe_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "MAMMALIA",
-         biome %in% biomes_sig_spe_mammals) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_spe_mammals$className <- factor(ele_spe_mammals$className, levels = c("MAMMALIA"),
-                                    labels = c("Mammals"))
-
-##low extinciton scenario
-ele_spe_mammals_low <- ele_spe_mammals %>% filter(ext == "low")
-
-##Biomes
-ele_spe_mammals_low$biome <- factor(ele_spe_mammals_low$biome,
-                                     levels = c("Tropical_&_subtropical_moist_broadleaf_forests"),
-                                     labels = c("Tropical & subtropical moist broadleaf forests"),
-                                     ordered = TRUE)
-
-png("text/figures/specialization/biomes/mammals_model_low.png",
-    width = 10, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-
-plot.mammals.low.spe <- vert_pivot_mammals %>% filter(ext_age == "low.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(specialization+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Specialization")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_spe_mammals_low, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
-  theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle= 90, size = 14,
-                                    face = "bold"))
-
-
-dev.off()
-
-# birds -------------------------------------------------------------------
-
-###############high extinction#########################
-
-biomes_sig_spe_birds <- sig_spe_res %>% filter(class == "AVES",
-                                               ext == "high") %>%
-                                           pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_birds <- vert_enfa_ages %>% filter(className == "AVES",
-                                                biome %in% biomes_sig_spe_birds) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_birds$ext_age <- factor(vert_pivot_birds$ext_age, 
-                                     levels = c("low.age",
-                                                "int.age",
-                                                "high.age"),
-                                     ordered = TRUE)
-
-vert_pivot_birds$className <- factor(vert_pivot_birds$className,
-                                       levels = c("AVES"),
-                                       labels = c("Birds"
-                                       ),
-                                       ordered = TRUE)
-
-vert_pivot_birds$biome <- factor(vert_pivot_birds$biome,
-                                   levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                              
-                                              "Tropical_&_subtropical_grasslands_savannas_and_shrublands",
-                                              "Flooded_grasslands_and_savannas",
-                                              "mangroves"),
-                                   labels = c("Tropical & subtropical moist broadleaf forests",
-                                              
-                                              "Tropical & subtropical grasslands savannas and shrublands",
-                                              "Flooded grasslands and savannas",
-                                              "Mangroves"),
-                                   ordered = TRUE)
-
-
-## df elements of models
-ele_spe_birds <- biome_spe_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "AVES",
-         biome %in% biomes_sig_spe_birds) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_spe_birds$className <- factor(ele_spe_birds$className, levels = c("AVES"),
-                                    labels = c("Birds"))
-
-##High extinciton scenario
-ele_spe_birds_high <- ele_spe_birds %>% filter(ext == "high")
-
-##Biomes
-ele_spe_birds_high$biome <- factor(ele_spe_birds_high$biome,
-                                   levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                              
-                                              "Tropical_&_subtropical_grasslands_savannas_and_shrublands",
-                                              "Flooded_grasslands_and_savannas",
-                                              "mangroves"),
-                                   labels = c("Tropical & subtropical moist broadleaf forests",
-                                              "Tropical & subtropical grasslands savannas and shrublands",
-                                              "Flooded grasslands and savannas",
-                                              "Mangroves"),
-                                     ordered = TRUE)
-
-
-png("text/figures/specialization/biomes/birds_model_high.png",
-    width = 40, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-
-plot.birds.high.spe <- vert_pivot_birds %>% filter(ext_age == "high.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(specialization+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Specialization")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_spe_birds_high, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
-  theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle= 90, size = 14,
-                                    face = "bold"))
-
-
-dev.off()
-
-###############int extinction#########################
-
-biomes_sig_spe_birds <- sig_spe_res %>% filter(class == "AVES",
-                                               ext == "int") %>%
-  pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_birds <- vert_enfa_ages %>% filter(className == "AVES",
-                                              biome %in% biomes_sig_spe_birds) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_birds$ext_age <- factor(vert_pivot_birds$ext_age, 
-                                   levels = c("low.age",
-                                              "int.age",
-                                              "high.age"),
-                                   ordered = TRUE)
-
-vert_pivot_birds$className <- factor(vert_pivot_birds$className,
-                                     levels = c("AVES"),
-                                     labels = c("Birds"
-                                     ),
-                                     ordered = TRUE)
-
-vert_pivot_birds$biome <- factor(vert_pivot_birds$biome,
-                                 levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                            "Tropical_&_subtropical_dry_broadleaf_forests",
-                                            "Tropical_&_subtropical_grasslands_savannas_and_shrublands",
-                                            "Flooded_grasslands_and_savannas",
-                                            "mangroves"),
-                                 labels = c("Tropical & subtropical moist broadleaf forests",
-                                            "Tropical & subtropical dry broadleaf forests",
-                                            "Tropical & subtropical grasslands savannas and shrublands",
-                                            "Flooded grasslands and savannas",
-                                            "Mangroves"),
-                                 ordered = TRUE)
-
-
-## df elements of models
-ele_spe_birds <- biome_spe_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "AVES",
-         biome %in% biomes_sig_spe_birds) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_spe_birds$className <- factor(ele_spe_birds$className, levels = c("AVES"),
-                                  labels = c("Birds"))
-
-##int extinciton scenario
-ele_spe_birds_int <- ele_spe_birds %>% filter(ext == "int")
-
-##Biomes
-ele_spe_birds_int$biome <- factor(ele_spe_birds_int$biome,
-                                   levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                              "Tropical_&_subtropical_dry_broadleaf_forests", 
-                                              "Tropical_&_subtropical_grasslands_savannas_and_shrublands",
-                                              "Flooded_grasslands_and_savannas",
-                                              "mangroves"),
-                                   labels = c("Tropical & subtropical moist broadleaf forests",
-                                              "Tropical & subtropical dry broadleaf forests",
-                                              "Tropical & subtropical grasslands savannas and shrublands",
-                                              "Flooded grasslands and savannas",
-                                              "Mangroves"),
-                                   ordered = TRUE)
-
-
-png("text/figures/specialization/biomes/birds_model_int.png",
-    width = 50, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-
-plot.birds.int.spe <- vert_pivot_birds %>% filter(ext_age == "int.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(specialization+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Specialization")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_spe_birds_int, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
-  theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle= 90, size = 14,
-                                    face = "bold"))
-
-
-dev.off()
-
-###############low extinction#########################
-
-biomes_sig_spe_birds <- sig_spe_res %>% filter(class == "AVES",
-                                               ext == "low") %>%
-  pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_birds <- vert_enfa_ages %>% filter(className == "AVES",
-                                              biome %in% biomes_sig_spe_birds) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_birds$ext_age <- factor(vert_pivot_birds$ext_age, 
-                                   levels = c("low.age",
-                                              "int.age",
-                                              "high.age"),
-                                   ordered = TRUE)
-
-vert_pivot_birds$className <- factor(vert_pivot_birds$className,
-                                     levels = c("AVES"),
-                                     labels = c("Birds"
-                                     ),
-                                     ordered = TRUE)
-
-vert_pivot_birds$biome <- factor(vert_pivot_birds$biome,
-                                 levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                            "Tropical_&_subtropical_dry_broadleaf_forests",
-                                            "Tropical_&_subtropical_grasslands_savannas_and_shrublands",
-                                            "Flooded_grasslands_and_savannas",
-                                            "mangroves"),
-                                 labels = c("Tropical & subtropical moist broadleaf forests",
-                                            "Tropical & subtropical dry broadleaf forests",
-                                            "Tropical & subtropical grasslands savannas and shrublands",
-                                            "Flooded grasslands and savannas",
-                                            "Mangroves"),
-                                 ordered = TRUE)
-
-
-## df elements of models
-ele_spe_birds <- biome_spe_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "AVES",
-         biome %in% biomes_sig_spe_birds) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_spe_birds$className <- factor(ele_spe_birds$className, levels = c("AVES"),
-                                  labels = c("Birds"))
-
-##low extinciton scenario
-ele_spe_birds_low <- ele_spe_birds %>% filter(ext == "low")
-
-##Biomes
-ele_spe_birds_low$biome <- factor(ele_spe_birds_low$biome,
-                                  levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                             "Tropical_&_subtropical_dry_broadleaf_forests", 
-                                             "Tropical_&_subtropical_grasslands_savannas_and_shrublands",
-                                             "Flooded_grasslands_and_savannas",
-                                             "mangroves"),
-                                  labels = c("Tropical & subtropical moist broadleaf forests",
-                                             "Tropical & subtropical dry broadleaf forests",
-                                             "Tropical & subtropical grasslands savannas and shrublands",
-                                             "Flooded grasslands and savannas",
-                                             "Mangroves"),
-                                  ordered = TRUE)
-
-
-png("text/figures/specialization/biomes/birds_model_low.png",
-    width = 50, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-
-plot.birds.low.spe <- vert_pivot_birds %>% filter(ext_age == "low.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(specialization+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Specialization")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_spe_birds_low, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
-  theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle= 90, size = 14,
-                                    face = "bold"))
-
-
-dev.off()
-
-
-# Reptiles ----------------------------------------------------------------
-
-#######high extinction#################
-biomes_sig_spe_reptiles <- sig_spe_res %>% filter(class == "REPTILIA",
-                                                  ext == "high") %>%
-  pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_reptiles <- vert_enfa_ages %>% filter(className == "REPTILIA",
-                                              biome %in% biomes_sig_spe_reptiles) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_reptiles$ext_age <- factor(vert_pivot_reptiles$ext_age, 
-                                   levels = c("low.age",
-                                              "int.age",
-                                              "high.age"),
-                                   ordered = TRUE)
-
-vert_pivot_reptiles$className <- factor(vert_pivot_reptiles$className,
-                                     levels = c("REPTILIA"),
-                                     labels = c("Reptiles"
-                                     ),
-                                     ordered = TRUE)
-
-vert_pivot_reptiles$biome <- factor(vert_pivot_reptiles$biome,
-                                 levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                            "Temperate_grasslands_savannas_and_ shrublands",
-                                            "Montane_grasslands_and_shrublands"),
-                                 labels = c("Tropical & subtropical moist broadleaf forests",
-                                            "Temperate grasslands savannas and shrublands",
-                                            "Montane grasslands and shrublands"),
-                                 ordered = TRUE)
-
-
-## df elements of models
-ele_spe_reptiles <- biome_spe_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "REPTILIA",
-         biome %in% biomes_sig_spe_reptiles) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_spe_reptiles$className <- factor(ele_spe_reptiles$className, levels = c("REPTILIA"),
-                                  labels = c("Reptiles"))
-
-##High extinciton scenario
-ele_spe_reptiles_high <- ele_spe_reptiles %>% filter(ext == "high")
-
-##Biomes
-ele_spe_reptiles_high$biome <- factor(ele_spe_reptiles_high$biome,
-                                      levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                                 "Temperate_grasslands_savannas_and_ shrublands",
-                                                 "Montane_grasslands_and_shrublands"),
-                                      labels = c("Tropical & subtropical moist broadleaf forests",
-                                                 "Temperate grasslands savannas and shrublands",
-                                                 "Montane grasslands and shrublands"),
-                                   ordered = TRUE)
-
-
-png("text/figures/specialization/biomes/reptiles_model_high.png",
-    width = 30, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-
-plot.reptiles.high.spe <- vert_pivot_reptiles %>% filter(ext_age == "high.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(specialization+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Specialization")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_spe_reptiles_high, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
-  theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle= 90, size = 14,
-                                    face = "bold"))
-
-
-dev.off()
-
-#######int extinction#################
-biomes_sig_spe_reptiles <- sig_spe_res %>% filter(class == "REPTILIA",
-                                                  ext == "int") %>%
-  pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_reptiles <- vert_enfa_ages %>% filter(className == "REPTILIA",
-                                                 biome %in% biomes_sig_spe_reptiles) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_reptiles$ext_age <- factor(vert_pivot_reptiles$ext_age, 
-                                      levels = c("low.age",
-                                                 "int.age",
-                                                 "high.age"),
-                                      ordered = TRUE)
-
-vert_pivot_reptiles$className <- factor(vert_pivot_reptiles$className,
-                                        levels = c("REPTILIA"),
-                                        labels = c("Reptiles"
-                                        ),
-                                        ordered = TRUE)
-
-vert_pivot_reptiles$biome <- factor(vert_pivot_reptiles$biome,
-                                    levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                               "Temperate_grasslands_savannas_and_ shrublands",
-                                               "Montane_grasslands_and_shrublands"),
-                                    labels = c("Tropical & subtropical moist broadleaf forests",
-                                               "Temperate grasslands savannas and shrublands",
-                                               "Montane grasslands and shrublands"),
-                                    ordered = TRUE)
-
-
-## df elements of models
-ele_spe_reptiles <- biome_spe_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "REPTILIA",
-         biome %in% biomes_sig_spe_reptiles) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_spe_reptiles$className <- factor(ele_spe_reptiles$className, levels = c("REPTILIA"),
-                                     labels = c("Reptiles"))
-
-##int extinciton scenario
-ele_spe_reptiles_int <- ele_spe_reptiles %>% filter(ext == "int")
-
-##Biomes
-ele_spe_reptiles_int$biome <- factor(ele_spe_reptiles_int$biome,
-                                      levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                                 "Temperate_grasslands_savannas_and_ shrublands",
-                                                 "Montane_grasslands_and_shrublands"),
-                                      labels = c("Tropical & subtropical moist broadleaf forests",
-                                                 "Temperate grasslands savannas and shrublands",
-                                                 "Montane grasslands and shrublands"),
-                                      ordered = TRUE)
-
-
-png("text/figures/specialization/biomes/reptiles_model_int.png",
-    width = 30, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-
-plot.reptiles.int.spe <- vert_pivot_reptiles %>% filter(ext_age == "int.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(specialization+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Specialization")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_spe_reptiles_int, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
-  theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle= 90, size = 14,
-                                    face = "bold"))
-
-
-dev.off()
-
-#######low extinction#################
-biomes_sig_spe_reptiles <- sig_spe_res %>% filter(class == "REPTILIA",
-                                                  ext == "low") %>%
-  pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_reptiles <- vert_enfa_ages %>% filter(className == "REPTILIA",
-                                                 biome %in% biomes_sig_spe_reptiles) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_reptiles$ext_age <- factor(vert_pivot_reptiles$ext_age, 
-                                      levels = c("low.age",
-                                                 "int.age",
-                                                 "high.age"),
-                                      ordered = TRUE)
-
-vert_pivot_reptiles$className <- factor(vert_pivot_reptiles$className,
-                                        levels = c("REPTILIA"),
-                                        labels = c("Reptiles"
-                                        ),
-                                        ordered = TRUE)
-
-vert_pivot_reptiles$biome <- factor(vert_pivot_reptiles$biome,
-                                    levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                               "Temperate_grasslands_savannas_and_ shrublands",
-                                               "Montane_grasslands_and_shrublands"),
-                                    labels = c("Tropical & subtropical moist broadleaf forests",
-                                               "Temperate grasslands savannas and shrublands",
-                                               "Montane grasslands and shrublands"),
-                                    ordered = TRUE)
-
-
-## df elements of models
-ele_spe_reptiles <- biome_spe_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "REPTILIA",
-         biome %in% biomes_sig_spe_reptiles) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_spe_reptiles$className <- factor(ele_spe_reptiles$className, levels = c("REPTILIA"),
-                                     labels = c("Reptiles"))
-
-##low extinction scenario
-ele_spe_reptiles_low <- ele_spe_reptiles %>% filter(ext == "low")
-
-##Biomes
-ele_spe_reptiles_low$biome <- factor(ele_spe_reptiles_low$biome,
-                                      levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                                 "Temperate_grasslands_savannas_and_ shrublands",
-                                                 "Montane_grasslands_and_shrublands"),
-                                      labels = c("Tropical & subtropical moist broadleaf forests",
-                                                 "Temperate grasslands savannas and shrublands",
-                                                 "Montane grasslands and shrublands"),
-                                      ordered = TRUE)
-
-
-png("text/figures/specialization/biomes/reptiles_model_low.png",
-    width = 30, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-
-plot.reptiles.low.spe <- vert_pivot_reptiles %>% filter(ext_age == "low.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(specialization+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Specialization")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_spe_reptiles_low, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
-  theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle= 90, size = 14,
-                                    face = "bold"))
-
-
-dev.off()
-
-
-# AMPHIBIA ----------------------------------------------------------------
-
-##########high extinction ##########################
-
-biomes_sig_spe_amphibians <- sig_spe_res %>% filter(class == "AMPHIBIA",
-                                                    ext == "high") %>%
-  pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_amphibians <- vert_enfa_ages %>% filter(className == "AMPHIBIA",
-                                              biome %in% biomes_sig_spe_amphibians) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_amphibians$ext_age <- factor(vert_pivot_amphibians$ext_age, 
-                                   levels = c("low.age",
-                                              "int.age",
-                                              "high.age"),
-                                   ordered = TRUE)
-
-vert_pivot_amphibians$className <- factor(vert_pivot_amphibians$className,
-                                     levels = c("AMPHIBIA"),
-                                     labels = c("Amphibians"
-                                     ),
-                                     ordered = TRUE)
-
-vert_pivot_amphibians$biome <- factor(vert_pivot_amphibians$biome,
-                                 levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                            "Tropical_&_subtropical_grasslands_savannas_and_shrublands",
-                                            "Temperate_grasslands_savannas_and_ shrublands"),
-                                 labels = c("Tropical & subtropical moist broadleaf forests",
-                                            "Tropical & subtropical grasslands savannas and shrublands",
-                                            "Temperate grasslands savannas and shrublands"),
-                                 ordered = TRUE)
-
-
-## df elements of models
-ele_spe_amphibians <- biome_spe_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "AMPHIBIA",
-         biome %in% biomes_sig_spe_amphibians) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_spe_amphibians$className <- factor(ele_spe_amphibians$className, levels = c("AMPHIBIA"),
-                                  labels = c("Amphibians"))
-
-##High extinciton scenario
-ele_spe_amphibians_high <- ele_spe_amphibians %>% filter(ext == "high")
-
-##Biomes
-ele_spe_amphibians_high$biome <- factor(ele_spe_amphibians_high$biome,
-                                        levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                                   "Tropical_&_subtropical_grasslands_savannas_and_shrublands",
-                                                   "Temperate_grasslands_savannas_and_ shrublands"),
-                                        labels = c("Tropical & subtropical moist broadleaf forests",
-                                                   "Tropical & subtropical grasslands savannas and shrublands",
-                                                   "Temperate grasslands savannas and shrublands"),
-                                   ordered = TRUE)
-
-
-png("text/figures/specialization/biomes/amphibians_model_high.png",
-    width = 30, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-
-plot.amphibians.high.spe <- vert_pivot_amphibians %>% filter(ext_age == "high.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(specialization+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Specialization")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_spe_amphibians_high, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
-  theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle= 90, size = 14,
-                                    face = "bold"))
-
-
-dev.off()
-
-##########int extinction ##########################
-
-biomes_sig_spe_amphibians <- sig_spe_res %>% filter(class == "AMPHIBIA",
-                                                    ext == "int") %>%
-  pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_amphibians <- vert_enfa_ages %>% filter(className == "AMPHIBIA",
-                                                   biome %in% biomes_sig_spe_amphibians) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_amphibians$ext_age <- factor(vert_pivot_amphibians$ext_age, 
-                                        levels = c("low.age",
-                                                   "int.age",
-                                                   "high.age"),
-                                        ordered = TRUE)
-
-vert_pivot_amphibians$className <- factor(vert_pivot_amphibians$className,
-                                          levels = c("AMPHIBIA"),
-                                          labels = c("Amphibians"
-                                          ),
-                                          ordered = TRUE)
-
-vert_pivot_amphibians$biome <- factor(vert_pivot_amphibians$biome,
-                                      levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                                 "Tropical_&_subtropical_grasslands_savannas_and_shrublands",
-                                                 "Temperate_grasslands_savannas_and_ shrublands"),
-                                      labels = c("Tropical & subtropical moist broadleaf forests",
-                                                 "Tropical & subtropical grasslands savannas and shrublands",
-                                                 "Temperate grasslands savannas and shrublands"),
-                                      ordered = TRUE)
-
-
-## df elements of models
-ele_spe_amphibians <- biome_spe_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "AMPHIBIA",
-         biome %in% biomes_sig_spe_amphibians) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_spe_amphibians$className <- factor(ele_spe_amphibians$className, levels = c("AMPHIBIA"),
-                                       labels = c("Amphibians"))
-
-##int extinciton scenario
-ele_spe_amphibians_int <- ele_spe_amphibians %>% filter(ext == "int")
-
-##Biomes
-ele_spe_amphibians_int$biome <- factor(ele_spe_amphibians_int$biome,
-                                        levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                                   "Tropical_&_subtropical_grasslands_savannas_and_shrublands",
-                                                   "Temperate_grasslands_savannas_and_ shrublands"),
-                                        labels = c("Tropical & subtropical moist broadleaf forests",
-                                                   "Tropical & subtropical grasslands savannas and shrublands",
-                                                   "Temperate grasslands savannas and shrublands"),
-                                        ordered = TRUE)
-
-
-png("text/figures/specialization/biomes/amphibians_model_int.png",
-    width = 30, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-
-plot.amphibians.int.spe <- vert_pivot_amphibians %>% filter(ext_age == "int.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(specialization+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Specialization")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_spe_amphibians_int, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
-  theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle= 90, size = 14,
-                                    face = "bold"))
-
-
-dev.off()
-
-##########low extinction ##########################
-
-biomes_sig_spe_amphibians <- sig_spe_res %>% filter(class == "AMPHIBIA",
-                                                    ext == "low") %>%
-  pull(biome) %>% unique()
-
-
-##pivoting
-vert_pivot_amphibians <- vert_enfa_ages %>% filter(className == "AMPHIBIA",
-                                                   biome %in% biomes_sig_spe_amphibians) %>% 
-  pivot_longer(cols = ends_with(".age"),
-               names_to = "ext_age",
-               values_to = "Ages") %>% 
-  filter(ext_age != "Estimated.age")
-
-##factors
-vert_pivot_amphibians$ext_age <- factor(vert_pivot_amphibians$ext_age, 
-                                        levels = c("low.age",
-                                                   "int.age",
-                                                   "high.age"),
-                                        ordered = TRUE)
-
-vert_pivot_amphibians$className <- factor(vert_pivot_amphibians$className,
-                                          levels = c("AMPHIBIA"),
-                                          labels = c("Amphibians"
-                                          ),
-                                          ordered = TRUE)
-
-vert_pivot_amphibians$biome <- factor(vert_pivot_amphibians$biome,
-                                      levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                                 "Tropical_&_subtropical_grasslands_savannas_and_shrublands"
-                                                 ),
-                                      labels = c("Tropical & subtropical moist broadleaf forests",
-                                                 "Tropical & subtropical grasslands savannas and shrublands"),
-                                      ordered = TRUE)
-
-
-## df elements of models
-ele_spe_amphibians <- biome_spe_results %>% select(term, Estimate, class, ext, biome) %>% 
-  filter(class == "AMPHIBIA",
-         biome %in% biomes_sig_spe_amphibians) %>% 
-  pivot_wider(names_from = "term",
-              values_from=  "Estimate") %>% 
-  rename(className = class)
-
-##changing factors name for matching with vert_enfa
-ele_spe_amphibians$className <- factor(ele_spe_amphibians$className, levels = c("AMPHIBIA"),
-                                       labels = c("Amphibians"))
-
-##low extinciton scenario
-ele_spe_amphibians_low <- ele_spe_amphibians %>% filter(ext == "low")
-
-##Biomes
-ele_spe_amphibians_low$biome <- factor(ele_spe_amphibians_low$biome,
-                                        levels = c("Tropical_&_subtropical_moist_broadleaf_forests",
-                                                   "Tropical_&_subtropical_grasslands_savannas_and_shrublands"
-                                                  ),
-                                        labels = c("Tropical & subtropical moist broadleaf forests",
-                                                   "Tropical & subtropical grasslands savannas and shrublands"
-                                                   ),
-                                        ordered = TRUE)
-
-
-png("text/figures/specialization/biomes/amphibians_model_low.png",
-    width = 20, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-
-plot.amphibians.low.spe <- vert_pivot_amphibians %>% filter(ext_age == "low.age") %>% 
-  ggplot(aes(x = log(Ages+1), y = log(specialization+1)))+
-  geom_bin2d() +
-  scico::scale_fill_scico(palette = "vik",
-                          name = "Richness")+
-  theme_bw()+
-  #geom_smooth(method = "lm", color = "red")+
-  xlab("Species ages")+
-  ylab("Specialization")+
-  facet_grid(className~biome, scales = "free", switch = "y")+
-  geom_abline(data = ele_spe_amphibians_low, aes(slope = Age, intercept = Intercept),
-              color = "red", size = 1)+
-  ggtitle(NULL)+
-  scale_y_continuous(position = "right")+
-  theme_bw() +
-  mynamestheme+
-  theme(legend.position = "none",
-        strip.text.y = element_text(angle= 90, size = 14,
-                                    face = "bold"))
-
-
-dev.off()
-
-
-
-
-
-
-# beta histogram ----------------------------------------------------------
-
-
-#############High extinction######################
-png("text/figures/specialization/biomes/model_beta_high.png",
-    width = 10, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-beta_spe %>% filter(ext == "high") %>%
-  ggplot(aes(x = Estimate, fill = class ))+
-  geom_rect(aes(xmin = -Inf,
-                xmax = 0, 
-                ymin = -Inf,
-                ymax = +Inf),
-            fill = "#f0f0f0",
-            color = "#f0f0f0")+
-  geom_vline(xintercept = 0, color = "black", linewidth = 1,
-             linetype = "dashed")+
-  geom_histogram(color = "black", bins = 15) +
-  scale_fill_manual(name = NULL,
-                    labels = c("Mammals", "Birds", "Reptiles", "Amphibians"),
-                    values = c( "red",
-                                "#fdae61",
-                                "#008837",
-                                "#a6dba0"))+
-  #xlim(-1.2,1.2)+
-  xlab("Beta")+
-  ylab("Count")+
-  #ggtitle("Specialization (High extinction)")+
-  theme_classic()+
-  #scale_y_continuous(expand = c(0,0))+
-  mynamestheme
-
-dev.off()
-
-#############int extinction######################
-png("text/figures/specialization/biomes/model_beta_int.png",
-    width = 10, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-beta_spe %>% filter(ext == "int") %>%
-  ggplot(aes(x = Estimate, fill = class ))+
-  geom_rect(aes(xmin = -Inf,
-                xmax = 0, 
-                ymin = -Inf,
-                ymax = +Inf),
-            fill = "#f0f0f0",
-            color = "#f0f0f0")+
-  geom_vline(xintercept = 0, color = "black", linewidth = 1,
-             linetype = "dashed")+
-  geom_histogram(color = "black", bins = 15) +
-  scale_fill_manual(name = NULL,
-                    labels = c("Mammals", "Birds", "Reptiles", "Amphibians"),
-                    values = c( "red",
-                                "#fdae61",
-                                "#008837",
-                                "#a6dba0"))+
-  #xlim(-1.2,1.2)+
-  xlab("Beta")+
-  ylab("Count")+
-  #ggtitle("Specialization (int extinction)")+
-  theme_classic()+
-  #scale_y_continuous(expand = c(0,0))+
-  mynamestheme
-
-dev.off()
-
-#############low extinction######################
-png("text/figures/specialization/biomes/model_beta_low.png",
-    width = 10, height = 10, units = "cm", 
-    pointsize = 8, res = 300)
-
-beta_spe %>% filter(ext == "low") %>%
-  ggplot(aes(x = Estimate, fill = class ))+
-  geom_rect(aes(xmin = -Inf,
-                xmax = 0, 
-                ymin = -Inf,
-                ymax = +Inf),
-            fill = "#f0f0f0",
-            color = "#f0f0f0")+
-  geom_vline(xintercept = 0, color = "black", linewidth = 1,
-             linetype = "dashed")+
-  geom_histogram(color = "black", bins = 15) +
-  scale_fill_manual(name = NULL,
-                    labels = c("Mammals", "Birds", "Reptiles", "Amphibians"),
-                    values = c( "red",
-                                "#fdae61",
-                                "#008837",
-                                "#a6dba0"))+
-  xlim(-0.4,0.4)+
-  xlab("Beta")+
-  ylab("Count")+
-  #ggtitle("Specialization (low extinction)")+
-  theme_classic()+
-  #scale_y_continuous(expand = c(0,0))+
-  mynamestheme
 
 dev.off()
