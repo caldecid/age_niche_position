@@ -1,4 +1,4 @@
-# Age-Dependent Niche Position and Specialization in Neotropical Vertebrates
+# Age-related Niche Position and Specialization in Neotropical Vertebrates
 
 This repository contains **R scripts, functions, and data** used to replicate the analyses from the manuscript *“Age-Dependent niche Position and specialization in Neotropical vertebrates.”*
 
@@ -8,7 +8,7 @@ This repository contains **R scripts, functions, and data** used to replicate th
 
 ## Repository Structure
 
-The repository is organized into **three methodological sections**, each with its own folder:
+The repository is organized into **four methodological sections**, each with its own folder:
 
 ### 1. Spatial Data and Manipulation  
 **Folder:** `results/scripts/ENFA`  
@@ -43,6 +43,23 @@ R scripts to assess phylogenetic signal, test hypotheses, and generate plots:
 - `final_tables.R`: Summarizes and formats the results from `weighted_pgls.R` and `biomes_pgls.R`.
 
 ---
+
+### 4. Sensitivity analyses  
+**Folder:** `results/scripts/sensitivity_analyses`  
+R scripts to perform the sensitivity analyses:
+
+(i) Spatial scale: `results/scripts/sensitivity_analyses/spatial_scale`
+- `whole_neotropic_analyses.R`: Runs Neotropical ENFA (without biome stratification) for the 4 tetrapod groups (VIF < 10). `#server`  
+- `correlation_neotropica_10th_3th.R`: Performs correlation analyses among weighted ENFA, Neotropical ENFA (VIF < 10), and Neotropical ENFA (VIF < 3).  
+- `whole_neotropical_plots_results.R`: Correlation assessment plots. (Most are not included in the MS).  
+
+(ii) Biovariable selection: `results/scripts/sensitivity_analyses/biovariable_selection`
+- `sensitivity_biome_climate_3th.R`: Climatic data manipulation for obtaining Biomes environmental conditions (VIF < 3)  
+- `neotropic_ENFA_3th.R`: Runs Neotropical ENFA (without biome stratification) for the 4 tetrapod groups (VIF < 3). 
+- `biome_ENFA_3th.R`: Runs biome-ENFA for the 4 tetrapod groups (VIF < 3). `#server`
+- `correlation_biome_3th.R`: Performs correlation analyses among biome-ENFA metrics (VIF < 10) and biome-ENFA metrics (VIF < 3)
+- `plots_biomes_3th.R`: Plots the results of pgls models form ENFA metrics with a VIF < 3.  
+
 
 ## Auxiliary Functions
 
