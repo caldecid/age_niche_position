@@ -98,6 +98,7 @@ estimate_bd <- function(phy, epsilon = 0, rho = 1, ml_optim = 'subplex') {
 }
 
 
+
 # Transforming a pgls model into a results dataframe  --------
 
 #' @title PGLS results
@@ -225,3 +226,179 @@ fun_biome_pgls <- function(df, class, phy, variable) {
   
   return(list_biome)
 } 
+
+
+# Generate metadata dictionary --------------------------------------------
+generate_metadata <- function(data_dir = "data/processed",
+                              output_file = "data_dictionary_biomes.csv") {
+  
+  files <- list.files(data_dir, pattern = "\\.csv$", full.names = TRUE, recursive = TRUE)
+  
+  metadata_list <- lapply(files, function(file) {
+    
+    df <- tryCatch(read.csv(file, nrows = 5), error = function(e) NULL)
+    if (is.null(df)) return(NULL)
+    
+    data.frame(
+      dataset = basename(file),
+      column_name = colnames(df),
+      description = NA,
+      units = NA,
+      data_type = sapply(df, class),
+      notes = NA,
+      stringsAsFactors = FALSE
+    )
+  })
+  
+  metadata <- do.call(rbind, metadata_list)
+  
+  write.csv(metadata, output_file, row.names = FALSE)
+  
+  message("Metadata template saved to: ", output_file)
+  
+  return(metadata)
+}
+
+#filling the column names
+fill_metadata_descriptions <- function(metadata) {
+  
+  dictionary <- list(
+    "species" = list(desc = "Species scientific name", units = "none"),
+    "species_name" = list(desc = "Species scientific name", units = "none"),
+    "genus" = list(desc = "Genus name", units = "none"),
+    "genusName" = list(desc = "Genus name", units = "none"),
+    "familyName" = list(desc = "Taxonomic family", units = "none"),
+    "orderName" = list(desc = "Taxonomic order", units = "none"),
+    "className" = list(desc = "Taxonomic class", units = "none"),
+    "class" = list(desc = "Taxonomic class", units = "none"),
+    "tree_id" = list(desc = "Identification of the phylogenetic tree", units = "none"),
+    "K" = list(desc = "Bloomberg's K (phylogenetic signal)", units = "dimensionless"),
+    "K_pval" = list(desc = "p-value of Bloomberg's K", units = "dimensionless"),
+    "lambda_pval" = list(desc = "p-value of Pagel's lambda", units = "dimensionless"),
+    
+    # ENFA metrics
+    "marginality" = list(desc = "ENFA marginality index", units = "dimensionless index"),
+    "specialization" = list(desc = "ENFA specialization index (inverse niche breadth)", units = "dimensionless index"),
+    "w.marginality" = list(desc = "Weighted ENFA marginality", units = "dimensionless index"),
+    "w.specialization" = list(desc = "Weighted ENFA specialization", units = "dimensionless index"),
+    
+    "BSI" = list(desc = "Biome specialization index", units = "dimensionless index"),
+    
+    # Regression outputs
+    "Estimate" = list(desc = "Regression coefficient estimate", units = "change in response per unit predictor"),
+    "Std..Error" = list(desc = "Standard error of estimate", units = "same as estimate"),
+    "t.value" = list(desc = "t-statistic", units = "dimensionless"),
+    "p_value" = list(desc = "P-value", units = "probability (0–1)"),
+    "Pr...t.." = list(desc = "P-value", units = "probability (0–1)"),
+    "adj.r.squared" = list(desc = "Adjusted R-squared", units = "proportion (0–1)"),
+    
+    # Phylogenetic signal
+    "lambda" = list(desc = "Pagel's lambda (phylogenetic signal)", units = "proportion (0–1)"),
+    "lam_low" = list(desc = "Lower CI of lambda", units = "proportion (0–1)"),
+    "lam_up" = list(desc = "Upper CI of lambda", units = "proportion (0–1)"),
+    
+    # Ages
+    "Estimated.age" = list(desc = "Estimated species age", units = "million years (Myr)"),
+    "tip.mean" = list(desc = "Mean of secies age across phylogenies", units = "million years (Myr)"),
+    "low.age" = list(desc = "Species age under low extinction scenario", units = "million years (Myr)"),
+    "int.age" = list(desc = "Species age under intermediate extinction scenario", units = "million years (Myr)"),
+    "high.age" = list(desc = "Species age under high extinction scenario", units = "million years (Myr)"),
+    
+    # Categorical
+    "redlistCategory" = list(desc = "IUCN conservation status", units = "categorical (IUCN classes)"),
+    "biome" = list(desc = "Biome classification", units = "categorical"),
+    "ext" = list(desc = "Extinction scenario", units = "categorical (low, intermediate, high)"),
+    
+    # Model structure
+    "term" = list(desc = "Regression model term (e.g., intercept, slope)", units = "categorical"),
+    "variable" = list(desc = "ENFA metric analyzed", units = "categorical"),
+    "enfa" = list(desc = "ENFA metric analyzed", units = "categorical"),
+    
+    # Summary statistics
+    "mean_B" = list(desc = "Mean regression coefficient estimate", units = "change in response per unit predictor"),
+    "median_B" = list(desc = "Median regression coefficient estimate", units = "change in response per unit predictor"),
+    "CI_lower_B" = list(desc = "Lower confidence interval of regression coefficient", units = "change in response per unit predictor"),
+    "CI_upper_B" = list(desc = "Upper confidence interval of regression coefficient", units = "change in response per unit predictor"),
+    
+    "mean_p" = list(desc = "Mean P-value", units = "probability (0–1)"),
+    "median_p" = list(desc = "Median P-value", units = "probability (0–1)"),
+    "CI_lower_p" = list(desc = "Lower confidence interval of P-value", units = "probability (0–1)"),
+    "CI_upper_p" = list(desc = "Upper confidence interval of P-value", units = "probability (0–1)"),
+    
+    "mean_R" = list(desc = "Mean adjusted R-squared", units = "proportion (0–1)"),
+    "median_R" = list(desc = "Median adjusted R-squared", units = "proportion (0–1)"),
+    "CI_lower_R" = list(desc = "Lower CI of adjusted R-squared", units = "proportion (0–1)"),
+    "CI_upper_R" = list(desc = "Upper CI of adjusted R-squared", units = "proportion (0–1)"),
+    
+    "mean_lambda" = list(desc = "Mean Pagel's lambda", units = "proportion (0–1)"),
+    "median_lambda" = list(desc = "Median Pagel's lambda", units = "proportion (0–1)"),
+    "CI_lower_lambda" = list(desc = "Lower CI of Pagel's lambda", units = "proportion (0–1)"),
+    "CI_upper_lambda" = list(desc = "Upper CI of Pagel's lambda", units = "proportion (0–1)"),
+    
+    "prop_significant" = list(desc = "Proportion of significant PGLS models", units = "proportion (0–1)")
+  )
+  
+  for (i in seq_len(nrow(metadata))) {
+    col <- metadata$column_name[i]
+    
+    if (col %in% names(dictionary)) {
+      metadata$description[i] <- dictionary[[col]]$desc
+      metadata$units[i] <- dictionary[[col]]$units
+    }
+  }
+  
+  return(metadata)
+}
+
+
+######### Generating metadata dictionaries for all data/processed sections
+
+##biomes
+meta_biomes <- generate_metadata(data_dir = "results/data/processed/biomes")
+
+meta_filled <- fill_metadata_descriptions(meta_biomes)
+
+write.csv(meta_filled, "results/data/processed/biomes/biomes_data_dictionary_filled.csv", row.names = FALSE)
+
+##weighted enfa
+meta_weighted_enfa <- generate_metadata(data_dir = "results/data/processed/weighted_enfa")
+
+meta_weighted_filled <- fill_metadata_descriptions(meta_weighted_enfa)
+
+write.csv(meta_filled, "results/data/processed/weighted_enfa/weighted_data_dictionary_filled.csv", row.names = FALSE)
+
+##sensitivity_analyses/biovariable_selection/biomes_3th
+meta_biomes_3th <- generate_metadata(data_dir = "results/data/processed/sensitivity_analyses/biovariable_selection/biomes_3th")
+
+meta_biomes_3th_filled <- fill_metadata_descriptions(meta_biomes_3th)
+
+write.csv(meta_filled, "results/data/processed/sensitivity_analyses/biovariable_selection/biomes_3th/biomes_3th_data_dictionary_filled.csv", row.names = FALSE)
+
+##sensitivity_analyses/biovariable_selection/whole_neotropics_3th
+meta_whole_3th <- generate_metadata(data_dir = "results/data/processed/sensitivity_analyses/biovariable_selection/whole_neotropics_3th")
+
+meta_whole_3th_filled <- fill_metadata_descriptions(meta_whole_3th)
+
+write.csv(meta_filled, "results/data/processed/sensitivity_analyses/biovariable_selection/whole_neotropics_3th/whole_neotropics_3th_data_dictionary_filled.csv", row.names = FALSE)
+
+
+##sensitivity_analyses/spatial_scale
+meta_spatial <- generate_metadata(data_dir = "results/data/processed/sensitivity_analyses/spatial_scale")
+
+meta_spatial_filled <- fill_metadata_descriptions(meta_spatial)
+
+write.csv(meta_spatial_filled, "results/data/processed/sensitivity_analyses/spatial_scale/spatial_scale_data_dictionary_filled.csv", row.names = FALSE)
+
+##data/processed
+meta_processed <- generate_metadata(data_dir = "results/data/processed/")
+
+meta_processed <- fill_metadata_descriptions(meta_processed) 
+
+meta_processed <- meta_processed %>% filter(dataset %in% c("marg_phylo_signal.csv",
+                                                           "specialization_phylo_signal.csv",
+                                                           "vert_enfa_ages.csv",
+                                                           "vert_enfa_unique.csv",
+                                                           "vertebrates_biome_enfa.csv"))
+
+write.csv(meta_processed, "results/data/processed/processed_data_dictionary_filled.csv", row.names = FALSE)
+

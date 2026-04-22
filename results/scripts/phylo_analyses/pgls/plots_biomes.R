@@ -97,7 +97,7 @@ mam_spe_biomes <- read_csv("results/data/processed/biomes/mam_spe_biomes.csv")
 
 
 ##summarizing
-sum_mam_spe <- mam_spe %>% group_by(biome, ext) %>% 
+sum_mam_spe <- mam_spe_biomes %>% group_by(biome, ext) %>% 
   summarize(
     mean_B = mean(Estimate),
     median_B = median(Estimate),
@@ -158,7 +158,6 @@ sum_mam_spe$variable <- "specialization"
 
 #read
 birds_marg_biomes <- read_csv("results/data/processed/biomes/birds_marg_biomes.csv")
-
 
 
 ##summarizing
@@ -234,16 +233,16 @@ sum_birds_spe$variable <- "specialization"
 
 # reptiles -------------------------------------------------------------------
 
-reptiles_string <- list.files(path = "C:/Users/carlo/OneDrive/Desktop/niche_position2/biomes2/REPTILIA")
+#reptiles_string <- list.files(path = "C:/Users/carlo/OneDrive/Desktop/niche_position2/biomes2/REPTILIA")
 
-list_reptiles <- vector(mode = "list", length = length(reptiles_string))
+#list_reptiles <- vector(mode = "list", length = length(reptiles_string))
 
-for(i in seq_along(reptiles_string)){
+#for(i in seq_along(reptiles_string)){
   
-  list_reptiles[[i]] <- read_csv(paste0("C:/Users/carlo/OneDrive/Desktop/niche_position2/biomes2/REPTILIA/",
-                                        reptiles_string[i]))
+  #list_reptiles[[i]] <- read_csv(paste0("C:/Users/carlo/OneDrive/Desktop/niche_position2/biomes2/REPTILIA/",
+                                     #   reptiles_string[i]))
   
-}
+#}
 
 ######## marginality ############
 # reptiles_results <- do.call("rbind", list_reptiles)
@@ -425,7 +424,7 @@ amphibians_spe_biomes <- read_csv("results/data/processed/biomes/amphibians_spe_
 
 
 ##summarizing
-sum_amphibians_spe <- amphibians_spe %>% group_by(biome, ext) %>% 
+sum_amphibians_spe <- amphibians_spe_biomes %>% group_by(biome, ext) %>% 
   summarize(
     mean_B = mean(Estimate),
     median_B = median(Estimate),
@@ -477,11 +476,10 @@ write_csv(sum_biomes_marg, file = "results/data/processed/biomes/marginality/sum
 
 ##significant table, intermediate extinction and the proportion of significant pvalues equal or above 0.5
 sum_biomes_marg_sig <- sum_biomes_marg %>% filter(ext == "high",
-                                                  prop_significant >= 0.5) %>% 
+                                                  prop_significant >= 0.8) %>% 
   mutate(significance_level = case_when(
     prop_significant >= 0.95 ~ "Strict (≥95%)",
-    prop_significant >= 0.80 ~ "Moderate (≥80%)",
-    prop_significant >= 0.50 ~ "Lenient (≥50%)"))
+    prop_significant >= 0.80 ~ "Moderate (≥80%)"))
 
 
 
@@ -513,293 +511,451 @@ write_csv(sum_biomes_spe, file = "results/data/processed/biomes/specialization/s
 
 ##significant table, intermediate extinction and the proportion of significant pvalues equal or above 0.5
 sum_biomes_spe_sig <- sum_biomes_spe %>% filter(ext == "high",
-                                                prop_significant >= 0.5) %>% 
+                                                prop_significant >= 0.8) %>% 
   mutate(significance_level = case_when(
     prop_significant >= 0.95 ~ "Strict (≥95%)",
-    prop_significant >= 0.80 ~ "Moderate (≥80%)",
-    prop_significant >= 0.50 ~ "Lenient (≥50%)"
+    prop_significant >= 0.80 ~ "Moderate (≥80%)"#,
+    #prop_significant >= 0.50 ~ "Lenient (≥50%)"
   ))
 
 
 write_xlsx(sum_biomes_spe_sig, path = "results/data/processed/biomes/specialization/sum_biomes_sig.xlsx")
 
+####Only birds have significant relationships for both ENFA metrics
 
-#########plots as error bars for the beta #############
+# Marginality pgls --------------------------------------------------------
 
-#binding significative results
+##calling general data
+vert_enfa_ages <- read_csv("results/data/processed/vert_enfa_ages.csv")
 
-df <- rbind(sum_biomes_marg_sig, sum_biomes_spe_sig)
+##list all model results from birds
 
+aves.files <- list.files("results/data/processed/biomes/AVES")
 
+list.aves <- vector("list", length = length(aves.files))
 
-# Convert significance to factor for proper ordering in legend
-df$significance_level <- factor(df$significance_level, 
-                                levels = c("Strict (≥95%)", "Moderate (≥80%)", 
-                                           "Lenient (≥50%)"))
-
-
-#ordering factors for ploting
-df$biome <- factor(df$biome, levels = c(
-  "Deserts and xeric shrublands",
-  "Mediterranean forests woodlands and scrub",
-  "Temperate broadleaf & mixed forests",
-  "Flooded grasslands and savannas",
-  "Tropical & subtropical grasslands savannas and shrublands",
-  "Tropical & subtropical coniferous forests",
-  "Mangroves",
-  "Tropical & subtropical moist broadleaf forests"))
-
-#breaking the biomes text in the figure
-df$biome <- str_wrap(df$biome, width = 25)
-
-df$class <- factor(df$class, levels = c("reptiles","birds","mammals" ))
-
-# Define custom colors for classes
-class_colors <- c(
-  "birds" = "#E69F00",   # Strong golden yellow
+for(i in seq_along(list.aves)){
   
-  "reptiles" = "#018571" # Strong teal green
-)
+  list.aves[[i]] <- read_csv(paste0("results/data/processed/biomes/AVES/",
+                                    aves.files[i]))
+}
 
-##principal result
-png("text/figures/biomes_CI_high.png", 
-    width = 30, height = 20,
-    units = "cm", pointsize = 8, res = 300)
+#binding dataframes
+aves.results <- do.call(rbind, list.aves)
+
+#saving
+write_csv(aves.results, file ="results/data/processed/biomes/birds_general_biomes.csv")
+
+#modifying terms and filtering
+aves_marg <- aves.results %>% 
+    mutate(term = str_replace(term, "^log\\(.*\\)$", "Beta")) %>% 
+    dplyr::rename(p_value = `Pr(>|t|)`) %>% 
+    filter(variable == "marginality",
+           ext == "high")
+
+aves_marg$term <- ifelse(aves_marg$term == "(Intercept)", 
+                        "Intercept", 
+                        aves_marg$term)
 
 
-ggplot(df, aes(x = biome, y = median_B, color = class,
-               shape = significance_level)) +
-  geom_point(size = 5.5, position = position_dodge(width = 1)) +  # Points for median_B
+#summarizing
+sum_marg_aves <- aves_marg %>% group_by(biome) %>% filter(term == "Beta") %>%  
+  summarize(
+    mean_B = mean(Estimate),
+    median_B = median(Estimate),
+    CI_lower_B = quantile(Estimate, 0.025),
+    CI_upper_B = quantile(Estimate, 0.975),
+    #mean_intercept = mean(Intercept),
+    mean_p = mean(p_value),
+    median_p = median(p_value),
+    CI_lower_p = quantile(p_value, 0.025),
+    CI_upper_p = quantile(p_value, 0.975),
+    prop_significant = mean(p_value < 0.05),
+    mean_R = mean(adj.r.squared),
+    median_R = median(adj.r.squared),
+    CI_lower_R = quantile(adj.r.squared, 0.025),
+    CI_upper_R = quantile(adj.r.squared, 0.975),
+    mean_lambda = mean(lambda),
+    median_lambda = median(lambda),
+    CI_lower_lambda = mean(lam_low),
+    CI_upper_lambda = mean(lam_up))
+
+#obtaining intercept
+sum_int_marg <- aves_marg %>% group_by(biome) %>% 
+  filter(term == "Intercept") %>%  
+  summarize(mean_intercept = mean(Estimate))
+
+sum_marg_aves <- left_join(sum_marg_aves, sum_int_marg, by = "biome")
+
+##significant biomes
+sig_marg_aves <- sum_marg_aves %>% filter(prop_significant >= 0.8)
+
+
+#modifying biomes names for plotting 
+sig_marg_aves$biome <- factor(sig_marg_aves$biome, labels = c("Deserts and xeric shrublands",
+                                                              "Tropical & subtropical dry broadleaf forests",
+                                                              "Tropical & subtropical grasslands savannas and shrublands",
+                                                              "Tropical & subtropical moist broadleaf forests"))
+
+sig_marg_aves$biome <- factor(sig_marg_aves$biome, levels = c("Tropical & subtropical moist broadleaf forests",
+                                                              "Tropical & subtropical grasslands savannas and shrublands",
+                                                              "Tropical & subtropical dry broadleaf forests",
+                                                              "Deserts and xeric shrublands"),
+                              ordered = TRUE)
+
+sig_marg_aves <- sig_marg_aves %>%   rename(biome_clean = biome)
+
+
+######Modifying general table
+aves_enfa <- vert_enfa_ages %>% filter(className == "AVES") %>% 
+  mutate(
+    Class = case_when(
+      className == "AVES"     ~ "Birds",
+      TRUE ~ className
+    ),
+    log_marg   = log1p(marginality),
+    log_spe = log1p(specialization),
+    log_high_age = log1p(high.age)
+  )
+
+aves_enfa <- aves_enfa %>%
+  mutate(biome_clean = gsub("_", " ", biome),
+         biome_clean = gsub("&", "&", biome_clean),     # keep & as is
+         biome_clean = gsub("  ", " ", biome_clean))    # remove double spaces
+
+#filtering for only significant biomes
+aves_enfa_marg <- aves_enfa %>% 
+                  filter(biome_clean %in% sig_marg_aves$biome_clean)
+
+#ordering factor
+aves_enfa_marg$biome_clean <- factor(aves_enfa_marg$biome_clean,
+                                     levels = levels(sig_marg_aves$biome_clean))
+
+# range of predictor
+x_range <- aves_enfa %>%
+  group_by(biome_clean) %>%
+  summarise(min_x = min(log_high_age),
+            max_x = max(log_high_age))
+
+# merge ranges with coefficients
+pred_input <- sig_marg_aves %>% 
+  left_join(x_range, by = "biome_clean")
+
+# generate grid of x and predicted y
+pred_lines <- pred_input %>%
+  mutate(x = map2(min_x, max_x, ~seq(.x, .y, length.out = 200))) %>%
+  unnest(x) %>%
+  mutate(
+    fit = mean_intercept + mean_B * x,
+    lower = mean_intercept + CI_lower_B * x,
+    upper = mean_intercept + CI_upper_B * x
+  )
+
+
+pred_lines$biome_clean <- factor(pred_lines$biome_clean, levels = levels(sig_marg_aves$biome_clean))
+
+##plotting
+biome_marg <- ggplot() +
+  geom_point(data = aves_enfa_marg,
+             aes(x = log_high_age, y = log_marg),
+             alpha = 0.3, size = 1,
+             color = "#E69F00") +
+  
+  geom_ribbon(data = pred_lines,
+              aes(x = x, ymin = lower, ymax = upper, fill = biome_clean),
+              alpha = 0.2, colour = "gray") +
+  
+  geom_line(data = pred_lines,
+            aes(x = x, y = fit),
+            color = "#E69F00",
+            size = 1) +
+  
+  facet_wrap(~ biome_clean, ncol = 2,
+             scales = "free") +
+  
+  labs(x = "Species age", 
+       y = "Marginality",
+       fill = "Biome") +
+  
+  theme_bw(base_size = 13) +
+  mynamestheme+
+  theme(
+    legend.position = "none",
+    strip.background = element_rect(fill = "white"))
+
+#saving
+svg("figures/biome_marg_vs_ages.svg",
+    width = 10, height = 8)
+
+biome_marg
+
+dev.off()
+
+
+##### CI for marginality ##########
+sig_marg_aves <- sig_marg_aves %>% mutate(biome_clean = str_wrap(biome_clean, width = 25))
+
+CI_marg_aves <- ggplot(sig_marg_aves, aes(x = biome_clean, y = median_B)) +
+  geom_point(size = 5.5, position = position_dodge(width = 1), 
+             color = "#E69F00") +  # Points for median_B
   geom_errorbar(aes(ymin = CI_lower_B, ymax = CI_upper_B), 
-                width = 0.4, position = position_dodge(width = 1)) +  # Error bars
+                width = 0.2, size = 0.5,
+                position = position_dodge(width = 1),
+                color = "#E69F00") +  # Error bars
   theme_bw() +
-  labs(x = NULL, y = "Beta", color = "Class") +
-  ylim(-0.45, 0.45) +
+  labs(x = NULL, y = "Beta") +
+  ylim(-0.30, 0.30) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "black", size = 0.75) +
   coord_flip() +
-  facet_wrap(~variable, labeller = as_labeller(c(
-    marginality = "Marginality",
-    specialization = "Specialization"
-  ))) +
-  scale_color_manual(values = class_colors, 
-                     guide = "none") +
-  scale_shape_manual(values = c(
-    "Strict (≥95%)" = 16,    # Solid Circle
-    "Moderate (≥80%)" = 17,  # Triangle
-    "Lenient (≥50%)" = 15    # Square
-  ), name = NULL) +
-  
+  scale_x_discrete(position = "top") + 
   mynamestheme +
   theme(
     panel.background = element_rect(fill = "gray98"),  # Light gray background
-    panel.grid.major.y = element_line(color = "grey49",
-                                      size = 0.75),
+    panel.grid.major.y = element_line(color = "grey79",
+                                      size = 0.4),
     panel.grid.major.x = element_blank(),# Subtle grid for reference
     panel.grid.minor = element_blank(),
     axis.text.x = element_text(size = 16),  # Increase x-axis text size
     axis.text.y = element_text(size = 15),
     axis.title.x = element_text(size = 17),
+    #axis.text.y.right = element_text(size = 15), 
     strip.text = element_text(size = 16),
-    legend.background = element_rect(fill = "white", color = "white"),
-    legend.text = element_text(size = 14),
-    legend.position = "bottom")
+    legend.position = "none")
 
+
+##saving
+svg("figures/CI_marg_biomes.svg",
+    width = 6, height = 4)
+
+CI_marg_aves
 
 dev.off()
 
 
-####################supplementary#######################
 
 
-## Intermediate extinction 
+# Specialization ----------------------------------------------------------
 
-##significant table, intermediate extinction and the proportion of significant pvalues equal or above 0.5
-sum_biomes_marg_sig <- sum_biomes_marg %>% filter(ext == "int",
-                                                  prop_significant >= 0.5) %>% 
-  mutate(significance_level = case_when(
-    prop_significant >= 0.95 ~ "Strict (≥95%)",
-    prop_significant >= 0.80 ~ "Moderate (≥80%)",
-    prop_significant >= 0.50 ~ "Lenient (≥50%)"
+aves.results  <- read_csv("results/data/processed/biomes/birds_general_biomes.csv")
+
+#modifying terms and filtering
+aves_spe <- aves.results %>% 
+  mutate(term = str_replace(term, "^log\\(.*\\)$", "Beta")) %>% 
+  dplyr::rename(p_value = `Pr(>|t|)`) %>% 
+  filter(variable == "specialization",
+         ext == "high")
+
+aves_spe$term <- ifelse(aves_spe$term == "(Intercept)", 
+                         "Intercept", 
+                         aves_spe$term)
+
+
+#summarizing
+sum_spe_aves <- aves_spe %>% group_by(biome) %>% filter(term == "Beta") %>%  
+  summarize(
+    mean_B = mean(Estimate),
+    median_B = median(Estimate),
+    CI_lower_B = quantile(Estimate, 0.025),
+    CI_upper_B = quantile(Estimate, 0.975),
+    #mean_intercept = mean(Intercept),
+    mean_p = mean(p_value),
+    median_p = median(p_value),
+    CI_lower_p = quantile(p_value, 0.025),
+    CI_upper_p = quantile(p_value, 0.975),
+    prop_significant = mean(p_value < 0.05),
+    mean_R = mean(adj.r.squared),
+    median_R = median(adj.r.squared),
+    CI_lower_R = quantile(adj.r.squared, 0.025),
+    CI_upper_R = quantile(adj.r.squared, 0.975),
+    mean_lambda = mean(lambda),
+    median_lambda = median(lambda),
+    CI_lower_lambda = mean(lam_low),
+    CI_upper_lambda = mean(lam_up))
+
+#obtaining intercept
+sum_int_spe <- aves_spe %>% group_by(biome) %>% 
+  filter(term == "Intercept") %>%  
+  summarize(mean_intercept = mean(Estimate))
+
+sum_spe_aves <- left_join(sum_spe_aves, sum_int_spe, by = "biome")
+
+##significant biomes
+sig_spe_aves <- sum_spe_aves %>% filter(prop_significant >= 0.8)
+
+write_xlsx(sig_spe_aves, "results/data/processed/biomes/sig_results_specializaiton.xlsx")
+
+#modifying biomes names for plotting 
+sig_spe_aves$biome <- factor(sig_spe_aves$biome, labels = c("Deserts and xeric shrublands",
+                                                            "Flooded grasslands and savannas",
+                                                            "Montane grasslands and shrublands",
+                                                            "Tropical & subtropical grasslands savannas and shrublands",
+                                                            "Tropical & subtropical moist broadleaf forests",
+                                                            "Mangroves"))
+
+sig_spe_aves$biome <- factor(sig_spe_aves$biome, levels = c("Tropical & subtropical moist broadleaf forests",
+                                                            "Mangroves",
+                                                            "Tropical & subtropical grasslands savannas and shrublands",
+                                                            "Flooded grasslands and savannas",
+                                                            "Montane grasslands and shrublands",
+                                                            "Deserts and xeric shrublands"))
+
+sig_spe_aves <- sig_spe_aves %>% rename(biome_clean = biome)
+
+
+######Modifying general table
+aves_enfa <- vert_enfa_ages %>% filter(className == "AVES") %>% 
+  mutate(
+    Class = case_when(
+      className == "AVES"     ~ "Birds",
+      TRUE ~ className
+    ),
+    log_marg   = log1p(marginality),
+    log_spe = log1p(specialization),
+    log_high_age = log1p(high.age)
+  )
+
+aves_enfa <- aves_enfa %>%
+  mutate(biome_clean = gsub("_", " ", biome),
+         biome_clean = gsub("&", "&", biome_clean),     # keep & as is
+         biome_clean = gsub("  ", " ", biome_clean))    # remove double spaces
+
+##change mangroves
+aves_enfa <- aves_enfa %>%
+  mutate(biome_clean = case_when(
+    biome_clean == "mangroves" ~ "Mangroves",
+    TRUE ~ biome_clean
   ))
 
 
-sum_biomes_spe_sig <- sum_biomes_spe %>% filter(ext == "int",
-                                                prop_significant >= 0.5) %>% 
-  mutate(significance_level = case_when(
-    prop_significant >= 0.95 ~ "Strict (≥95%)",
-    prop_significant >= 0.80 ~ "Moderate (≥80%)",
-    prop_significant >= 0.50 ~ "Lenient (≥50%)"
-  ))
+#filtering for only significant biomes
+aves_enfa_spe <- aves_enfa %>% 
+  filter(biome_clean %in% sig_spe_aves$biome_clean)
+
+#ordering factor
+aves_enfa_spe$biome_clean <- factor(aves_enfa_spe$biome_clean,
+                                     levels = levels(sig_spe_aves$biome_clean))
 
 
 
-df <- rbind(sum_biomes_marg_sig, sum_biomes_spe_sig)
+# range of predictor
+x_range <- aves_enfa_spe %>%
+  group_by(biome_clean) %>%
+  summarise(min_x = min(log_high_age),
+            max_x = max(log_high_age)) %>% 
+  mutate(biome_clean = as.factor(biome_clean))
+
+# merge ranges with coefficients
+pred_input <- sig_spe_aves %>% 
+  left_join(x_range, by = "biome_clean")
+
+# generate grid of x and predicted y
+pred_lines <- pred_input %>%
+  mutate(x = map2(min_x, max_x, ~seq(.x, .y, length.out = 200))) %>%
+  unnest(x) %>%
+  mutate(
+    fit = mean_intercept + mean_B * x,
+    lower = mean_intercept + CI_lower_B * x,
+    upper = mean_intercept + CI_upper_B * x
+  )
+
+pred_lines$biome_clean <- factor(pred_lines$biome_clean, levels = levels(sig_spe_aves$biome_clean))
 
 
+pred_lines$biome_clean <- factor(pred_lines$biome_clean, labels = c("Tropical & subtropical moist broadleaf forests",
+                                                                    "Mangroves",
+                                                                    "Tropical & subtropical grasslands savannas and shrublands",
+                                                                    "Flooded grasslands and savannas",
+                                                                    "Montane grasslands and shrublands",
+                                                                    "Deserts and xeric shrublands"))
 
-# Convert significance to factor for proper ordering in legend
-df$significance_level <- factor(df$significance_level, 
-                                levels = c("Strict (≥95%)", "Moderate (≥80%)", 
-                                           "Lenient (≥50%)"))
+##plotting
+biome_spe <- ggplot() +
+  geom_point(data = aves_enfa_spe,
+             aes(x = log_high_age, y = log_spe),
+             alpha = 0.3, size = 1,
+             color = "#E69F00") +
+  
+  geom_ribbon(data = pred_lines,
+              aes(x = x, ymin = lower, ymax = upper, fill = biome_clean),
+              alpha = 0.2, colour = "gray") +
+  
+  geom_line(data = pred_lines,
+            aes(x = x, y = fit),
+            color = "#E69F00",
+            size = 1) +
+  
+  facet_wrap(~ biome_clean, ncol = 2,
+             scales = "free") +
+  
+  labs(x = "Species age", 
+       y = "Specialization",
+       fill = "Biome") +
+  
+  theme_bw(base_size = 13) +
+  mynamestheme+
+  theme(
+    legend.position = "none",
+    strip.background = element_rect(fill = "white"))
+
+#saving
+svg("figures/biome_spe_vs_ages.svg",
+    width = 10, height = 10)
+
+biome_spe
+
+dev.off()
 
 
-#ordering factors for ploting
-df$biome <- factor(df$biome, levels = c(
-  "Deserts and xeric shrublands",
-  "Mediterranean forests woodlands and scrub",
-  "Temperate broadleaf & mixed forests",
-  "Flooded grasslands and savannas",
-  "Tropical & subtropical grasslands savannas and shrublands",
-  "Tropical & subtropical coniferous forests",
-  "Mangroves",
-  "Tropical & subtropical moist broadleaf forests"))
+##### CI for marginality ##########
+sig_spe_aves <- sig_spe_aves %>% 
+  mutate(biome_clean = str_wrap(biome_clean, width = 25))
 
-#breaking the biomes text in the figure
-df$biome <- str_wrap(df$biome, width = 25)
+sig_spe_aves$biome_clean <- factor(sig_spe_aves$biome_clean,
+                                   levels = c("Deserts and xeric\nshrublands",
+                                              "Montane grasslands and\nshrublands",
+                                              "Flooded grasslands and\nsavannas",
+                                              "Tropical & subtropical\ngrasslands savannas and\nshrublands",
+                                              "Mangroves",
+                                              "Tropical & subtropical\nmoist broadleaf forests"))
 
-df$class <- factor(df$class, levels = c("reptiles","birds","mammals" ))
-
-# Define custom colors for classes
-class_colors <- c(
-  "birds" = "#E69F00",   # Strong golden yellow
-  "mammals" = "#E66101", # Deep orange
-  "reptiles" = "#018571" # Strong teal green
-)
-
-##principal result
-png("text/figures/Sup/biomes_CI_int.png", 
-    width = 30, height = 20,
-    units = "cm", pointsize = 8, res = 300)
-
-
-ggplot(df, aes(x = biome, y = median_B, color = class,
-               shape = significance_level)) +
-  geom_point(size = 5.5, position = position_dodge(width = 1)) +  # Points for median_B
-  geom_errorbar(aes(ymin = CI_lower_B, ymax = CI_upper_B), 
-                width = 0.4, position = position_dodge(width = 1)) +  # Error bars
-  theme_bw() +
-  labs(x = NULL, y = "Beta", color = "Class") +
-  ylim(-0.45, 0.45) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+##plotting CI biomes
+CI_spe_aves <- ggplot(sig_spe_aves, aes(x = biome_clean,
+                                          y = median_B)) +
+  geom_point(size = 5.5,
+             position = position_dodge(width = 1), 
+             color = "#E69F00") +  # Points for median_B
+  geom_errorbar(aes(ymin = CI_lower_B,
+                    ymax = CI_upper_B), 
+                    width = 0.2, size = 0.5,
+                    position = position_dodge(width = 1),
+                    color = "#E69F00") +  # Error bars
+          theme_bw() +
+          labs(x = NULL, y = "Beta") +
+  ylim(-0.30, 0.30) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black", size = 0.75) +
   coord_flip() +
-  facet_wrap(~variable, labeller = as_labeller(c(
-    marginality = "Marginality",
-    specialization = "Specialization"
-  ))) +
-  scale_color_manual(values = class_colors, 
-                     guide = "none") +
-  scale_shape_manual(values = c(
-    "Strict (≥95%)" = 16,    # Solid Circle
-    "Moderate (≥80%)" = 17,  # Triangle
-    "Lenient (≥50%)" = 15    # Square
-  ), name = NULL) +
+  scale_x_discrete(position = "top") + 
   mynamestheme +
   theme(
     panel.background = element_rect(fill = "gray98"),  # Light gray background
-    panel.grid.major = element_line(color = "gray90"), # Subtle grid for reference
+    panel.grid.major.y = element_line(color = "grey79",
+                                      size = 0.4),
+    panel.grid.major.x = element_blank(),# Subtle grid for reference
     panel.grid.minor = element_blank(),
     axis.text.x = element_text(size = 16),  # Increase x-axis text size
     axis.text.y = element_text(size = 15),
     axis.title.x = element_text(size = 17),
-    legend.background = element_rect(fill = "white", color = "white"),
-    legend.text = element_text(size = 14) )
+    #axis.text.y.right = element_text(size = 15), 
+    strip.text = element_text(size = 16),
+    legend.position = "none")
+
+
+##saving
+svg("figures/CI_spe_biomes.svg",
+    width = 6, height = 6)
+
+CI_spe_aves
 
 dev.off()
 
 
-## Low extinction 
-
-##significant table, intermediate extinction and the proportion of significant pvalues equal or above 0.5
-sum_biomes_marg_sig <- sum_biomes_marg %>% filter(ext == "low",
-                                                  prop_significant >= 0.5) %>% 
-  mutate(significance_level = case_when(
-    prop_significant >= 0.95 ~ "Strict (≥95%)",
-    prop_significant >= 0.80 ~ "Moderate (≥80%)",
-    prop_significant >= 0.50 ~ "Lenient (≥50%)"
-  ))
-
-
-sum_biomes_spe_sig <- sum_biomes_spe %>% filter(ext == "low",
-                                                prop_significant >= 0.5) %>% 
-  mutate(significance_level = case_when(
-    prop_significant >= 0.95 ~ "Strict (≥95%)",
-    prop_significant >= 0.80 ~ "Moderate (≥80%)",
-    prop_significant >= 0.50 ~ "Lenient (≥50%)"
-  ))
-
-
-
-df <- rbind(sum_biomes_marg_sig, sum_biomes_spe_sig)
-
-
-
-# Convert significance to factor for proper ordering in legend
-df$significance_level <- factor(df$significance_level, 
-                                levels = c("Strict (≥95%)", "Moderate (≥80%)", 
-                                           "Lenient (≥50%)"))
-
-
-#ordering factors for ploting
-df$biome <- factor(df$biome, levels = c(
-  "Deserts and xeric shrublands",
-  "Mediterranean forests woodlands and scrub",
-  "Temperate broadleaf & mixed forests",
-  "Flooded grasslands and savannas",
-  "Tropical & subtropical grasslands savannas and shrublands",
-  "Tropical & subtropical coniferous forests",
-  "Mangroves",
-  "Tropical & subtropical moist broadleaf forests"))
-
-#breaking the biomes text in the figure
-df$biome <- str_wrap(df$biome, width = 25)
-
-df$class <- factor(df$class, levels = c("amphibians","reptiles","birds","mammals" ))
-
-# Define custom colors for classes
-class_colors <- c(
-  "birds" = "#E69F00",   # Strong golden yellow
-  "mammals" = "#E66101", # Deep orange
-  "reptiles" = "#018571", # Strong teal green
-  "amphibians" = "#7fbf7b"
-)
-
-##principal result
-png("text/figures/Sup/biomes_CI_low.png", 
-    width = 30, height = 20,
-    units = "cm", pointsize = 8, res = 300)
-
-ggplot(df, aes(x = biome, y = median_B, color = class,
-               shape = significance_level)) +
-  geom_point(size = 5.5, position = position_dodge(width = 1)) +  # Points for median_B
-  geom_errorbar(aes(ymin = CI_lower_B, ymax = CI_upper_B), 
-                width = 0.4, position = position_dodge(width = 1)) +  # Error bars
-  theme_bw() +
-  labs(x = NULL, y = "Beta", color = "Class") +
-  ylim(-0.45, 0.45) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
-  coord_flip() +
-  facet_wrap(~variable, labeller = as_labeller(c(
-    marginality = "Marginality",
-    specialization = "Specialization"
-  ))) +
-  scale_color_manual(values = class_colors, 
-                     guide = "none") +
-  scale_shape_manual(values = c(
-    "Strict (≥95%)" = 16,    # Solid Circle
-    "Moderate (≥80%)" = 17,  # Triangle
-    "Lenient (≥50%)" = 15    # Square
-  ), name = NULL) +
-  mynamestheme +
-  theme(
-    panel.background = element_rect(fill = "gray98"),  # Light gray background
-    panel.grid.major = element_line(color = "gray90"), # Subtle grid for reference
-    panel.grid.minor = element_blank(),
-    axis.text.x = element_text(size = 16),  # Increase x-axis text size
-    axis.text.y = element_text(size = 15),
-    axis.title.x = element_text(size = 17),
-    legend.background = element_rect(fill = "white", color = "white"),
-    legend.text = element_text(size = 14) )
-
-
-
-dev.off()

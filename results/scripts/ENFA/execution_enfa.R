@@ -1,43 +1,74 @@
 ##sourcing the libraries and the directories
 source(file.path(getwd(), "/source.R"))
 
-# neotropical reptiles ----------------------------------------------------
+# libraries
+library(tidyverse)
+library(terra)
+library(sf)
+library(geodata)
+library(stringr)
+library(devtools)
+#devtools::install_github("rinnan/CENFA")
+library(CENFA)
+library(sp)
+library(parallel)
 
-##terrestrial ecosystems
-terrestrial_ecos <- readOGR("Biomes", "wwf_terr_ecos")
+
+w <- geodata::worldclim_global(var = "bio", res = 10, path = tempdir())
 
 ###only Neotropics
-neotropics <- terrestrial_ecos[which(terrestrial_ecos@data[["REALM"]] == "NT"), ]
+biomes <- st_read("results/data/raw/biomes/wwf_terr_ecos.shp")
 
-##eliminating inexisting biomes, there are no biome 98 and 99
-bio98 <- which(neotropics@data$BIOME == 98)
-bio99 <- which(neotropics@data$BIOME == 99)
-ine.bios <- c(bio98, bio99)
-neotropics <- neotropics[-ine.bios, ]
+neotropics <- biomes %>% filter(REALM == "NT")
+
+##how to aggregate all the neotropics biomes in just one area
+
+neotropics <- st_make_valid(neotropics)  # first quick pass
+
+#  Force validation using a geometry repair trick
+neotropics_valid <- neotropics %>%
+  mutate(geometry = st_buffer(geometry, 0))
+
+#eliminating biome 98 and 99
+neotropics_valid <- neotropics_valid %>% filter(!BIOME %in% c(98,99))
+
 
 ##aggregating the polygons which pertain to the same biome
-neotropics.ag <- aggregate(neotropics, by = "BIOME")
+neotropics_biome <- neotropics_valid %>%
+                       group_by(BIOME) %>%
+                       summarise(geometry = st_union(geometry)) %>%
+                       ungroup() %>%
+                       st_make_valid()
 
 ###creating a dataframe with the biomes names
-BIOME_n <- c(1:14)
-BIOME_D <- c("Tropical_&_subtropical_moist_broadleaf_forests", 
-             "Tropical_&_subtropical_dry_broadleaf_forests",
-             "Tropical_&_subtropical_coniferous_forests", 
-             "Temperate_broadleaf_&_mixed_forests",
-             "Temperate_coniferous_forests",
-             "Boreal_Forests/Taiga",
-             "Tropical_&_subtropical_grasslands_savannas_and_shrublands",
-             "Temperate_grasslands_savannas_and_ shrublands",
-             "Flooded_grasslands_and_savannas",
-             "Montane_grasslands_and_shrublands",
-             "Tundra", "Mediterranean_forests_woodlands_and_scrub",
-             "Deserts_and_xeric_shrublands", "mangroves")
-Biome <- data.frame(BIOME_n, BIOME_D)
+biome_names <- tibble(
+  BIOME = 1:14,
+  BIOME_NAME = c(
+    "Tropical & Subtropical Moist Broadleaf Forests",
+    "Tropical & Subtropical Dry Broadleaf Forests",
+    "Tropical & Subtropical Coniferous Forests",
+    "Temperate Broadleaf & Mixed Forests",
+    "Temperate Conifer Forests",
+    "Boreal Forests/Taiga",
+    "Tropical & Subtropical Grasslands, Savannas & Shrublands",
+    "Temperate Grasslands, Savannas & Shrublands",
+    "Flooded Grasslands & Savannas",
+    "Montane Grasslands & Shrublands",
+    "Tundra",
+    "Mediterranean Forests, Woodlands & Scrub",
+    "Deserts & Xeric Shrublands",
+    "Mangroves"
+  )
+)
 
-neotropics.ag <- merge(neotropics.ag, Biome, by.x = "BIOME", by.y = "BIOME_n")
+#Join names
+neotropics_biome <- neotropics_biome %>%
+              left_join(biome_names, by = "BIOME")
 
 ###getting climate data####
-w <- raster :: getData('worldclim', var='bio', res=10)
+w <- geodata::worldclim_global(var = "bio", res = 10, path = tempdir())
+
+
 
 ####getting dsm neotropical reptiles###
 neotropical_reptiles <- readOGR("neotropical_reptiles", "data_0")
@@ -80,10 +111,10 @@ write_csv(neotropical_reptiles_enfa,
 # neotropical amphibians --------------------------------------------------
 
 ###getting climate data####
-w <- getData('worldclim', var='bio', res=10)
+w <- raster::getData('worldclim', var='bio', res=10)
 
 ####getting dsm neotropical amphibians###
-neotropical_amphibians <- readOGR("neotropical_amphibians", "data_0")
+neotropical_amphibians <- rgdal::readOGR("neotropical_amphibians", "data_0")
 
 ###calling dsm and climate
 neotropical_amphibians_dsm <- dsm.climate.vectorized(realm = neotropics.ag,
