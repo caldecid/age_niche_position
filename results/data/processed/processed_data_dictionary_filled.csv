@@ -1,0 +1,17 @@
+"dataset","column_name","description","units","data_type","notes"
+"vert_enfa_ages.csv","biome","Biome classification","categorical","character",NA
+"vert_enfa_ages.csv","species","Species scientific name","none","character",NA
+"vert_enfa_ages.csv","marginality","ENFA marginality index","dimensionless index","numeric",NA
+"vert_enfa_ages.csv","specialization","ENFA specialization index (inverse niche breadth)","dimensionless index","numeric",NA
+"vert_enfa_ages.csv","w.marginality","Weighted ENFA marginality","dimensionless index","numeric",NA
+"vert_enfa_ages.csv","w.specialization","Weighted ENFA specialization","dimensionless index","numeric",NA
+"vert_enfa_ages.csv","orderName","Taxonomic order","none","character",NA
+"vert_enfa_ages.csv","className","Taxonomic class","none","character",NA
+"vert_enfa_ages.csv","familyName","Taxonomic family","none","character",NA
+"vert_enfa_ages.csv","genusName","Genus name","none","character",NA
+"vert_enfa_ages.csv","redlistCategory","IUCN conservation status","categorical (IUCN classes)","character",NA
+"vert_enfa_ages.csv","BSI","Biome specialization index","dimensionless index","integer",NA
+"vert_enfa_ages.csv","Estimated.age","Estimated species age","million years (Myr)","numeric",NA
+"vert_enfa_ages.csv","low.age","Species age under low extinction scenario","million years (Myr)","numeric",NA
+"vert_enfa_ages.csv","int.age","Species age under intermediate extinction scenario","million years (Myr)","numeric",NA
+"vert_enfa_ages.csv","high.age","Species age under high extinction scenario","million years (Myr)","numeric",NA

@@ -1,0 +1,47 @@
+"dataset","column_name","description","units","data_type","notes"
+"biomes_3th_data_dictionary_filled.csv","dataset",NA,NA,"character",NA
+"biomes_3th_data_dictionary_filled.csv","column_name",NA,NA,"character",NA
+"biomes_3th_data_dictionary_filled.csv","description",NA,NA,"character",NA
+"biomes_3th_data_dictionary_filled.csv","units",NA,NA,"character",NA
+"biomes_3th_data_dictionary_filled.csv","data_type",NA,NA,"character",NA
+"biomes_3th_data_dictionary_filled.csv","notes",NA,NA,"logical",NA
+"sum_biomes_marg_3th.csv","biome","Biome classification","categorical","character",NA
+"sum_biomes_marg_3th.csv","mean_B","Mean regression coefficient estimate","change in response per unit predictor","numeric",NA
+"sum_biomes_marg_3th.csv","median_B","Median regression coefficient estimate","change in response per unit predictor","numeric",NA
+"sum_biomes_marg_3th.csv","CI_lower_B","Lower confidence interval of regression coefficient","change in response per unit predictor","numeric",NA
+"sum_biomes_marg_3th.csv","CI_upper_B","Upper confidence interval of regression coefficient","change in response per unit predictor","numeric",NA
+"sum_biomes_marg_3th.csv","mean_p","Mean P-value","probability (0–1)","numeric",NA
+"sum_biomes_marg_3th.csv","median_p","Median P-value","probability (0–1)","numeric",NA
+"sum_biomes_marg_3th.csv","CI_lower_p","Lower confidence interval of P-value","probability (0–1)","numeric",NA
+"sum_biomes_marg_3th.csv","CI_upper_p","Upper confidence interval of P-value","probability (0–1)","numeric",NA
+"sum_biomes_marg_3th.csv","prop_significant","Proportion of significant PGLS models","proportion (0–1)","numeric",NA
+"sum_biomes_marg_3th.csv","mean_R","Mean adjusted R-squared","proportion (0–1)","numeric",NA
+"sum_biomes_marg_3th.csv","median_R","Median adjusted R-squared","proportion (0–1)","numeric",NA
+"sum_biomes_marg_3th.csv","CI_lower_R","Lower CI of adjusted R-squared","proportion (0–1)","numeric",NA
+"sum_biomes_marg_3th.csv","CI_upper_R","Upper CI of adjusted R-squared","proportion (0–1)","numeric",NA
+"sum_biomes_marg_3th.csv","mean_lambda","Mean Pagel's lambda","proportion (0–1)","numeric",NA
+"sum_biomes_marg_3th.csv","median_lambda","Median Pagel's lambda","proportion (0–1)","numeric",NA
+"sum_biomes_marg_3th.csv","CI_lower_lambda","Lower CI of Pagel's lambda","proportion (0–1)","numeric",NA
+"sum_biomes_marg_3th.csv","CI_upper_lambda","Upper CI of Pagel's lambda","proportion (0–1)","numeric",NA
+"sum_biomes_marg_3th.csv","class","Taxonomic class","none","character",NA
+"sum_biomes_marg_3th.csv","variable","ENFA metric analyzed","categorical","character",NA
+"sum_biomes_spe_3th.csv","biome","Biome classification","categorical","character",NA
+"sum_biomes_spe_3th.csv","mean_B","Mean regression coefficient estimate","change in response per unit predictor","numeric",NA
+"sum_biomes_spe_3th.csv","median_B","Median regression coefficient estimate","change in response per unit predictor","numeric",NA
+"sum_biomes_spe_3th.csv","CI_lower_B","Lower confidence interval of regression coefficient","change in response per unit predictor","numeric",NA
+"sum_biomes_spe_3th.csv","CI_upper_B","Upper confidence interval of regression coefficient","change in response per unit predictor","numeric",NA
+"sum_biomes_spe_3th.csv","mean_p","Mean P-value","probability (0–1)","numeric",NA
+"sum_biomes_spe_3th.csv","median_p","Median P-value","probability (0–1)","numeric",NA
+"sum_biomes_spe_3th.csv","CI_lower_p","Lower confidence interval of P-value","probability (0–1)","numeric",NA
+"sum_biomes_spe_3th.csv","CI_upper_p","Upper confidence interval of P-value","probability (0–1)","numeric",NA
+"sum_biomes_spe_3th.csv","prop_significant","Proportion of significant PGLS models","proportion (0–1)","numeric",NA
+"sum_biomes_spe_3th.csv","mean_R","Mean adjusted R-squared","proportion (0–1)","numeric",NA
+"sum_biomes_spe_3th.csv","median_R","Median adjusted R-squared","proportion (0–1)","numeric",NA
+"sum_biomes_spe_3th.csv","CI_lower_R","Lower CI of adjusted R-squared","proportion (0–1)","numeric",NA
+"sum_biomes_spe_3th.csv","CI_upper_R","Upper CI of adjusted R-squared","proportion (0–1)","numeric",NA
+"sum_biomes_spe_3th.csv","mean_lambda","Mean Pagel's lambda","proportion (0–1)","numeric",NA
+"sum_biomes_spe_3th.csv","median_lambda","Median Pagel's lambda","proportion (0–1)","numeric",NA
+"sum_biomes_spe_3th.csv","CI_lower_lambda","Lower CI of Pagel's lambda","proportion (0–1)","numeric",NA
+"sum_biomes_spe_3th.csv","CI_upper_lambda","Upper CI of Pagel's lambda","proportion (0–1)","numeric",NA
+"sum_biomes_spe_3th.csv","class","Taxonomic class","none","character",NA
+"sum_biomes_spe_3th.csv","variable","ENFA metric analyzed","categorical","character",NA

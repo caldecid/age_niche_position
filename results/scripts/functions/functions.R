@@ -272,16 +272,12 @@ fill_metadata_descriptions <- function(metadata) {
     "className" = list(desc = "Taxonomic class", units = "none"),
     "class" = list(desc = "Taxonomic class", units = "none"),
     "tree_id" = list(desc = "Identification of the phylogenetic tree", units = "none"),
-    "K" = list(desc = "Bloomberg's K (phylogenetic signal)", units = "dimensionless"),
-    "K_pval" = list(desc = "p-value of Bloomberg's K", units = "dimensionless"),
-    "lambda_pval" = list(desc = "p-value of Pagel's lambda", units = "dimensionless"),
     
     # ENFA metrics
     "marginality" = list(desc = "ENFA marginality index", units = "dimensionless index"),
     "specialization" = list(desc = "ENFA specialization index (inverse niche breadth)", units = "dimensionless index"),
     "w.marginality" = list(desc = "Weighted ENFA marginality", units = "dimensionless index"),
     "w.specialization" = list(desc = "Weighted ENFA specialization", units = "dimensionless index"),
-    
     "BSI" = list(desc = "Biome specialization index", units = "dimensionless index"),
     
     # Regression outputs
@@ -296,6 +292,9 @@ fill_metadata_descriptions <- function(metadata) {
     "lambda" = list(desc = "Pagel's lambda (phylogenetic signal)", units = "proportion (0–1)"),
     "lam_low" = list(desc = "Lower CI of lambda", units = "proportion (0–1)"),
     "lam_up" = list(desc = "Upper CI of lambda", units = "proportion (0–1)"),
+    "K" = list(desc = "Bloomberg's K (phylogenetic signal)", units = "dimensionless"),
+    "K_pval" = list(desc = "p-value of Bloomberg's K", units = "dimensionless"),
+    "lambda_pval" = list(desc = "p-value of Pagel's lambda", units = "dimensionless"),
     
     # Ages
     "Estimated.age" = list(desc = "Estimated species age", units = "million years (Myr)"),
@@ -365,21 +364,21 @@ meta_weighted_enfa <- generate_metadata(data_dir = "results/data/processed/weigh
 
 meta_weighted_filled <- fill_metadata_descriptions(meta_weighted_enfa)
 
-write.csv(meta_filled, "results/data/processed/weighted_enfa/weighted_data_dictionary_filled.csv", row.names = FALSE)
+write.csv(meta_weighted_filled, "results/data/processed/weighted_enfa/weighted_data_dictionary_filled.csv", row.names = FALSE)
 
 ##sensitivity_analyses/biovariable_selection/biomes_3th
 meta_biomes_3th <- generate_metadata(data_dir = "results/data/processed/sensitivity_analyses/biovariable_selection/biomes_3th")
 
 meta_biomes_3th_filled <- fill_metadata_descriptions(meta_biomes_3th)
 
-write.csv(meta_filled, "results/data/processed/sensitivity_analyses/biovariable_selection/biomes_3th/biomes_3th_data_dictionary_filled.csv", row.names = FALSE)
+write.csv(meta_biomes_3th_filled, "results/data/processed/sensitivity_analyses/biovariable_selection/biomes_3th/biomes_3th_data_dictionary_filled.csv", row.names = FALSE)
 
 ##sensitivity_analyses/biovariable_selection/whole_neotropics_3th
 meta_whole_3th <- generate_metadata(data_dir = "results/data/processed/sensitivity_analyses/biovariable_selection/whole_neotropics_3th")
 
 meta_whole_3th_filled <- fill_metadata_descriptions(meta_whole_3th)
 
-write.csv(meta_filled, "results/data/processed/sensitivity_analyses/biovariable_selection/whole_neotropics_3th/whole_neotropics_3th_data_dictionary_filled.csv", row.names = FALSE)
+write.csv(meta_whole_3th_filled, "results/data/processed/sensitivity_analyses/biovariable_selection/whole_neotropics_3th/whole_neotropics_3th_data_dictionary_filled.csv", row.names = FALSE)
 
 
 ##sensitivity_analyses/spatial_scale
@@ -394,11 +393,15 @@ meta_processed <- generate_metadata(data_dir = "results/data/processed/")
 
 meta_processed <- fill_metadata_descriptions(meta_processed) 
 
-meta_processed <- meta_processed %>% filter(dataset %in% c("marg_phylo_signal.csv",
-                                                           "specialization_phylo_signal.csv",
-                                                           "vert_enfa_ages.csv",
-                                                           "vert_enfa_unique.csv",
-                                                           "vertebrates_biome_enfa.csv"))
-
+meta_processed <- meta_processed %>% filter(dataset == "vert_enfa_ages.csv")
+                                                      
 write.csv(meta_processed, "results/data/processed/processed_data_dictionary_filled.csv", row.names = FALSE)
+
+
+##phylogenetic_signal
+meta_phylo <- generate_metadata(data_dir = "results/data/processed/phylogenetic_signal")
+
+meta_phylo_filled <- fill_metadata_descriptions(meta_phylo_filled) 
+
+write.csv(meta_phylo_filled, "results/data/processed/phylo_signal_data_dictionary_filled.csv", row.names = FALSE)
 

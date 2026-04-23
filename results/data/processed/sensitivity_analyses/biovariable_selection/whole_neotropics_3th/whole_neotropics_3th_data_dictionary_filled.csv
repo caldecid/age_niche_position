@@ -1,0 +1,56 @@
+"dataset","column_name","description","units","data_type","notes"
+"amphibians_enfa_3th.csv","species_name","Species scientific name","none","character",NA
+"amphibians_enfa_3th.csv","marginality","ENFA marginality index","dimensionless index","numeric",NA
+"amphibians_enfa_3th.csv","specialization","ENFA specialization index (inverse niche breadth)","dimensionless index","numeric",NA
+"aves_enfa_3th.csv","species_name","Species scientific name","none","character",NA
+"aves_enfa_3th.csv","marginality","ENFA marginality index","dimensionless index","numeric",NA
+"aves_enfa_3th.csv","specialization","ENFA specialization index (inverse niche breadth)","dimensionless index","numeric",NA
+"mammals_enfa_3th.csv","species_name","Species scientific name","none","character",NA
+"mammals_enfa_3th.csv","marginality","ENFA marginality index","dimensionless index","numeric",NA
+"mammals_enfa_3th.csv","specialization","ENFA specialization index (inverse niche breadth)","dimensionless index","numeric",NA
+"amphi_results.csv","term","Regression model term (e.g., intercept, slope)","categorical","character",NA
+"amphi_results.csv","Estimate","Regression coefficient estimate","change in response per unit predictor","numeric",NA
+"amphi_results.csv","Std..Error","Standard error of estimate","same as estimate","numeric",NA
+"amphi_results.csv","t.value","t-statistic","dimensionless","numeric",NA
+"amphi_results.csv","Pr...t..","P-value","probability (0–1)","numeric",NA
+"amphi_results.csv","adj.r.squared","Adjusted R-squared","proportion (0–1)","numeric",NA
+"amphi_results.csv","lambda","Pagel's lambda (phylogenetic signal)","proportion (0–1)","numeric",NA
+"amphi_results.csv","lam_low","Lower CI of lambda","proportion (0–1)","numeric",NA
+"amphi_results.csv","lam_up","Upper CI of lambda","proportion (0–1)","numeric",NA
+"amphi_results.csv","class","Taxonomic class","none","character",NA
+"amphi_results.csv","ext","Extinction scenario","categorical (low, intermediate, high)","character",NA
+"amphi_results.csv","biome","Biome classification","categorical","character",NA
+"reptiles_results.csv","term","Regression model term (e.g., intercept, slope)","categorical","character",NA
+"reptiles_results.csv","Estimate","Regression coefficient estimate","change in response per unit predictor","numeric",NA
+"reptiles_results.csv","Std..Error","Standard error of estimate","same as estimate","numeric",NA
+"reptiles_results.csv","t.value","t-statistic","dimensionless","numeric",NA
+"reptiles_results.csv","Pr...t..","P-value","probability (0–1)","numeric",NA
+"reptiles_results.csv","adj.r.squared","Adjusted R-squared","proportion (0–1)","numeric",NA
+"reptiles_results.csv","lambda","Pagel's lambda (phylogenetic signal)","proportion (0–1)","numeric",NA
+"reptiles_results.csv","lam_low","Lower CI of lambda","proportion (0–1)","numeric",NA
+"reptiles_results.csv","lam_up","Upper CI of lambda","proportion (0–1)","numeric",NA
+"reptiles_results.csv","class","Taxonomic class","none","character",NA
+"reptiles_results.csv","ext","Extinction scenario","categorical (low, intermediate, high)","character",NA
+"reptiles_results.csv","biome","Biome classification","categorical","character",NA
+"summary_pgls.csv","biome","Biome classification","categorical","character",NA
+"summary_pgls.csv","mean_B","Mean regression coefficient estimate","change in response per unit predictor","numeric",NA
+"summary_pgls.csv","median_B","Median regression coefficient estimate","change in response per unit predictor","numeric",NA
+"summary_pgls.csv","CI_lower_B","Lower confidence interval of regression coefficient","change in response per unit predictor","numeric",NA
+"summary_pgls.csv","CI_upper_B","Upper confidence interval of regression coefficient","change in response per unit predictor","numeric",NA
+"summary_pgls.csv","mean_p","Mean P-value","probability (0–1)","numeric",NA
+"summary_pgls.csv","median_p","Median P-value","probability (0–1)","numeric",NA
+"summary_pgls.csv","CI_lower_p","Lower confidence interval of P-value","probability (0–1)","numeric",NA
+"summary_pgls.csv","CI_upper_p","Upper confidence interval of P-value","probability (0–1)","numeric",NA
+"summary_pgls.csv","prop_significant","Proportion of significant PGLS models","proportion (0–1)","numeric",NA
+"summary_pgls.csv","mean_R","Mean adjusted R-squared","proportion (0–1)","numeric",NA
+"summary_pgls.csv","median_R","Median adjusted R-squared","proportion (0–1)","numeric",NA
+"summary_pgls.csv","CI_lower_R","Lower CI of adjusted R-squared","proportion (0–1)","numeric",NA
+"summary_pgls.csv","CI_upper_R","Upper CI of adjusted R-squared","proportion (0–1)","numeric",NA
+"summary_pgls.csv","mean_lambda","Mean Pagel's lambda","proportion (0–1)","numeric",NA
+"summary_pgls.csv","median_lambda","Median Pagel's lambda","proportion (0–1)","numeric",NA
+"summary_pgls.csv","CI_lower_lambda","Lower CI of Pagel's lambda","proportion (0–1)","numeric",NA
+"summary_pgls.csv","CI_upper_lambda","Upper CI of Pagel's lambda","proportion (0–1)","numeric",NA
+"summary_pgls.csv","class","Taxonomic class","none","character",NA
+"reptiles_enfa_3th.csv","species_name","Species scientific name","none","character",NA
+"reptiles_enfa_3th.csv","marginality","ENFA marginality index","dimensionless index","numeric",NA
+"reptiles_enfa_3th.csv","specialization","ENFA specialization index (inverse niche breadth)","dimensionless index","numeric",NA

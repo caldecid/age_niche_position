@@ -1,0 +1,105 @@
+"dataset","column_name","description","units","data_type","notes"
+"amphibians_marg_biomes.csv","term","Regression model term (e.g., intercept, slope)","categorical","character",NA
+"amphibians_marg_biomes.csv","Estimate","Regression coefficient estimate","change in response per unit predictor","numeric",NA
+"amphibians_marg_biomes.csv","Std..Error","Standard error of estimate","same as estimate","numeric",NA
+"amphibians_marg_biomes.csv","t.value","t-statistic","dimensionless","numeric",NA
+"amphibians_marg_biomes.csv","p_value","P-value","probability (0–1)","numeric",NA
+"amphibians_marg_biomes.csv","adj.r.squared","Adjusted R-squared","proportion (0–1)","numeric",NA
+"amphibians_marg_biomes.csv","lambda","Pagel's lambda (phylogenetic signal)","proportion (0–1)","numeric",NA
+"amphibians_marg_biomes.csv","lam_low","Lower CI of lambda","proportion (0–1)","numeric",NA
+"amphibians_marg_biomes.csv","lam_up","Upper CI of lambda","proportion (0–1)","numeric",NA
+"amphibians_marg_biomes.csv","class","Taxonomic class","none","character",NA
+"amphibians_marg_biomes.csv","ext","Extinction scenario","categorical (low, intermediate, high)","character",NA
+"amphibians_marg_biomes.csv","biome","Biome classification","categorical","character",NA
+"amphibians_marg_biomes.csv","variable","ENFA metric analyzed","categorical","character",NA
+"amphibians_spe_biomes.csv","term","Regression model term (e.g., intercept, slope)","categorical","character",NA
+"amphibians_spe_biomes.csv","Estimate","Regression coefficient estimate","change in response per unit predictor","numeric",NA
+"amphibians_spe_biomes.csv","Std..Error","Standard error of estimate","same as estimate","numeric",NA
+"amphibians_spe_biomes.csv","t.value","t-statistic","dimensionless","numeric",NA
+"amphibians_spe_biomes.csv","p_value","P-value","probability (0–1)","numeric",NA
+"amphibians_spe_biomes.csv","adj.r.squared","Adjusted R-squared","proportion (0–1)","numeric",NA
+"amphibians_spe_biomes.csv","lambda","Pagel's lambda (phylogenetic signal)","proportion (0–1)","numeric",NA
+"amphibians_spe_biomes.csv","lam_low","Lower CI of lambda","proportion (0–1)","logical",NA
+"amphibians_spe_biomes.csv","lam_up","Upper CI of lambda","proportion (0–1)","numeric",NA
+"amphibians_spe_biomes.csv","class","Taxonomic class","none","character",NA
+"amphibians_spe_biomes.csv","ext","Extinction scenario","categorical (low, intermediate, high)","character",NA
+"amphibians_spe_biomes.csv","biome","Biome classification","categorical","character",NA
+"amphibians_spe_biomes.csv","variable","ENFA metric analyzed","categorical","character",NA
+"birds_marg_biomes.csv","term","Regression model term (e.g., intercept, slope)","categorical","character",NA
+"birds_marg_biomes.csv","Estimate","Regression coefficient estimate","change in response per unit predictor","numeric",NA
+"birds_marg_biomes.csv","Std..Error","Standard error of estimate","same as estimate","numeric",NA
+"birds_marg_biomes.csv","t.value","t-statistic","dimensionless","numeric",NA
+"birds_marg_biomes.csv","p_value","P-value","probability (0–1)","numeric",NA
+"birds_marg_biomes.csv","adj.r.squared","Adjusted R-squared","proportion (0–1)","numeric",NA
+"birds_marg_biomes.csv","lambda","Pagel's lambda (phylogenetic signal)","proportion (0–1)","numeric",NA
+"birds_marg_biomes.csv","lam_low","Lower CI of lambda","proportion (0–1)","numeric",NA
+"birds_marg_biomes.csv","lam_up","Upper CI of lambda","proportion (0–1)","numeric",NA
+"birds_marg_biomes.csv","class","Taxonomic class","none","character",NA
+"birds_marg_biomes.csv","ext","Extinction scenario","categorical (low, intermediate, high)","character",NA
+"birds_marg_biomes.csv","biome","Biome classification","categorical","character",NA
+"birds_marg_biomes.csv","variable","ENFA metric analyzed","categorical","character",NA
+"birds_spe_biomes.csv","term","Regression model term (e.g., intercept, slope)","categorical","character",NA
+"birds_spe_biomes.csv","Estimate","Regression coefficient estimate","change in response per unit predictor","numeric",NA
+"birds_spe_biomes.csv","Std..Error","Standard error of estimate","same as estimate","numeric",NA
+"birds_spe_biomes.csv","t.value","t-statistic","dimensionless","numeric",NA
+"birds_spe_biomes.csv","p_value","P-value","probability (0–1)","numeric",NA
+"birds_spe_biomes.csv","adj.r.squared","Adjusted R-squared","proportion (0–1)","numeric",NA
+"birds_spe_biomes.csv","lambda","Pagel's lambda (phylogenetic signal)","proportion (0–1)","numeric",NA
+"birds_spe_biomes.csv","lam_low","Lower CI of lambda","proportion (0–1)","numeric",NA
+"birds_spe_biomes.csv","lam_up","Upper CI of lambda","proportion (0–1)","numeric",NA
+"birds_spe_biomes.csv","class","Taxonomic class","none","character",NA
+"birds_spe_biomes.csv","ext","Extinction scenario","categorical (low, intermediate, high)","character",NA
+"birds_spe_biomes.csv","biome","Biome classification","categorical","character",NA
+"birds_spe_biomes.csv","variable","ENFA metric analyzed","categorical","character",NA
+"mam_marg_biomes.csv","term","Regression model term (e.g., intercept, slope)","categorical","character",NA
+"mam_marg_biomes.csv","Estimate","Regression coefficient estimate","change in response per unit predictor","numeric",NA
+"mam_marg_biomes.csv","Std..Error","Standard error of estimate","same as estimate","numeric",NA
+"mam_marg_biomes.csv","t.value","t-statistic","dimensionless","numeric",NA
+"mam_marg_biomes.csv","p_value","P-value","probability (0–1)","numeric",NA
+"mam_marg_biomes.csv","adj.r.squared","Adjusted R-squared","proportion (0–1)","numeric",NA
+"mam_marg_biomes.csv","lambda","Pagel's lambda (phylogenetic signal)","proportion (0–1)","numeric",NA
+"mam_marg_biomes.csv","lam_low","Lower CI of lambda","proportion (0–1)","numeric",NA
+"mam_marg_biomes.csv","lam_up","Upper CI of lambda","proportion (0–1)","numeric",NA
+"mam_marg_biomes.csv","class","Taxonomic class","none","character",NA
+"mam_marg_biomes.csv","ext","Extinction scenario","categorical (low, intermediate, high)","character",NA
+"mam_marg_biomes.csv","biome","Biome classification","categorical","character",NA
+"mam_marg_biomes.csv","variable","ENFA metric analyzed","categorical","character",NA
+"mam_spe_biomes.csv","term","Regression model term (e.g., intercept, slope)","categorical","character",NA
+"mam_spe_biomes.csv","Estimate","Regression coefficient estimate","change in response per unit predictor","numeric",NA
+"mam_spe_biomes.csv","Std..Error","Standard error of estimate","same as estimate","numeric",NA
+"mam_spe_biomes.csv","t.value","t-statistic","dimensionless","numeric",NA
+"mam_spe_biomes.csv","p_value","P-value","probability (0–1)","numeric",NA
+"mam_spe_biomes.csv","adj.r.squared","Adjusted R-squared","proportion (0–1)","numeric",NA
+"mam_spe_biomes.csv","lambda","Pagel's lambda (phylogenetic signal)","proportion (0–1)","numeric",NA
+"mam_spe_biomes.csv","lam_low","Lower CI of lambda","proportion (0–1)","numeric",NA
+"mam_spe_biomes.csv","lam_up","Upper CI of lambda","proportion (0–1)","numeric",NA
+"mam_spe_biomes.csv","class","Taxonomic class","none","character",NA
+"mam_spe_biomes.csv","ext","Extinction scenario","categorical (low, intermediate, high)","character",NA
+"mam_spe_biomes.csv","biome","Biome classification","categorical","character",NA
+"mam_spe_biomes.csv","variable","ENFA metric analyzed","categorical","character",NA
+"reptiles_marg_biomes.csv","term","Regression model term (e.g., intercept, slope)","categorical","character",NA
+"reptiles_marg_biomes.csv","Estimate","Regression coefficient estimate","change in response per unit predictor","numeric",NA
+"reptiles_marg_biomes.csv","Std..Error","Standard error of estimate","same as estimate","numeric",NA
+"reptiles_marg_biomes.csv","t.value","t-statistic","dimensionless","numeric",NA
+"reptiles_marg_biomes.csv","p_value","P-value","probability (0–1)","numeric",NA
+"reptiles_marg_biomes.csv","adj.r.squared","Adjusted R-squared","proportion (0–1)","numeric",NA
+"reptiles_marg_biomes.csv","lambda","Pagel's lambda (phylogenetic signal)","proportion (0–1)","numeric",NA
+"reptiles_marg_biomes.csv","lam_low","Lower CI of lambda","proportion (0–1)","numeric",NA
+"reptiles_marg_biomes.csv","lam_up","Upper CI of lambda","proportion (0–1)","numeric",NA
+"reptiles_marg_biomes.csv","class","Taxonomic class","none","character",NA
+"reptiles_marg_biomes.csv","ext","Extinction scenario","categorical (low, intermediate, high)","character",NA
+"reptiles_marg_biomes.csv","biome","Biome classification","categorical","character",NA
+"reptiles_marg_biomes.csv","variable","ENFA metric analyzed","categorical","character",NA
+"reptiles_spe_biomes.csv","term","Regression model term (e.g., intercept, slope)","categorical","character",NA
+"reptiles_spe_biomes.csv","Estimate","Regression coefficient estimate","change in response per unit predictor","numeric",NA
+"reptiles_spe_biomes.csv","Std..Error","Standard error of estimate","same as estimate","numeric",NA
+"reptiles_spe_biomes.csv","t.value","t-statistic","dimensionless","numeric",NA
+"reptiles_spe_biomes.csv","p_value","P-value","probability (0–1)","numeric",NA
+"reptiles_spe_biomes.csv","adj.r.squared","Adjusted R-squared","proportion (0–1)","numeric",NA
+"reptiles_spe_biomes.csv","lambda","Pagel's lambda (phylogenetic signal)","proportion (0–1)","numeric",NA
+"reptiles_spe_biomes.csv","lam_low","Lower CI of lambda","proportion (0–1)","numeric",NA
+"reptiles_spe_biomes.csv","lam_up","Upper CI of lambda","proportion (0–1)","numeric",NA
+"reptiles_spe_biomes.csv","class","Taxonomic class","none","character",NA
+"reptiles_spe_biomes.csv","ext","Extinction scenario","categorical (low, intermediate, high)","character",NA
+"reptiles_spe_biomes.csv","biome","Biome classification","categorical","character",NA
+"reptiles_spe_biomes.csv","variable","ENFA metric analyzed","categorical","character",NA

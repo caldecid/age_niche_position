@@ -1,0 +1,13 @@
+"dataset","column_name","description","units","data_type","notes"
+"marg_phylo_signal.csv","tree_id","Identification of the phylogenetic tree","none","integer",NA
+"marg_phylo_signal.csv","K","Bloomberg's K (phylogenetic signal)","dimensionless","numeric",NA
+"marg_phylo_signal.csv","K_pval","p-value of Bloomberg's K","dimensionless","numeric",NA
+"marg_phylo_signal.csv","lambda","Pagel's lambda (phylogenetic signal)","proportion (0–1)","numeric",NA
+"marg_phylo_signal.csv","lambda_pval","p-value of Pagel's lambda","dimensionless","numeric",NA
+"marg_phylo_signal.csv","class","Taxonomic class","none","character",NA
+"specialization_phylo_signal.csv","tree_id","Identification of the phylogenetic tree","none","integer",NA
+"specialization_phylo_signal.csv","K","Bloomberg's K (phylogenetic signal)","dimensionless","numeric",NA
+"specialization_phylo_signal.csv","K_pval","p-value of Bloomberg's K","dimensionless","numeric",NA
+"specialization_phylo_signal.csv","lambda","Pagel's lambda (phylogenetic signal)","proportion (0–1)","numeric",NA
+"specialization_phylo_signal.csv","lambda_pval","p-value of Pagel's lambda","dimensionless","numeric",NA
+"specialization_phylo_signal.csv","class","Taxonomic class","none","character",NA

@@ -74,6 +74,136 @@ Raw input data were obtained from:
 > Due to licensing restrictions, original shapefiles and phylogenetic trees are **not redistributed** in this repository. Users must obtain these data directly from the original sources.
 
 ---
+## 📁 Data Repository Structure
+
+All processed data used in the analyses are stored in:
+
+`data/processed/`
+
+This directory serves as the main entry point for all datasets included in this repository. It contains both **primary datasets** and **subdirectories with analysis-specific outputs**.
+
+---
+
+### Top-level contents
+
+- `processed_data_dictionary_filled.csv`  
+  Data dictionary describing all variables contained in `vert_enfa_ages.csv`.
+
+- `vert_enfa_ages.csv`  
+  Species-level dataset (across the four tetrapod groups: amphibians, reptiles, birds, and mammals) including:
+  - ENFA metrics (weighted and biome-specific)  
+  - Estimated species ages  
+  - Corrected species ages under different extinction scenarios  
+
+- `vert_enfa_ages_list.RData`  
+  R data object containing a hierarchical list of datasets used in phylogenetic comparative analyses.
+
+  **Structure:**
+  - The object is organized by tetrapod group (amphibians, reptiles, birds, mammals).  
+  - Each group contains **100 datasets**, each corresponding to a different randomly sampled phylogenetic tree (from VertLife or BirdTree).  
+  - Each dataset represents one phylogenetic replicate.
+
+  **Contents of each dataset:**
+  - Species identity and taxonomic information  
+  - Estimated species ages derived from the corresponding phylogeny  
+  - Corrected species ages under different extinction scenarios (low, intermediate, high)  
+  - ENFA-derived niche metrics:
+    - Marginality and specialization (biome-based ENFA)  
+    - Weighted marginality and specialization (weighted ENFA)  
+
+  **Purpose:**
+  This object captures phylogenetic uncertainty by storing replicated datasets across 100 alternative phylogenetic trees per tetrapod group. These datasets were used to run PGLS models and to compute summary statistics (e.g., mean, median, confidence intervals) across phylogenetic replicates.
+
+  **Notes:**
+  - Each dataset corresponds to an independent phylogenetic hypothesis.  
+  - No phylogenetic trees are included; only derived species-level attributes are stored.  
+
+---
+
+### Subdirectories
+
+#### `biomes_enfa/`
+Contains ENFA results calculated separately for each biome (Variance Inflation Factor, VIF < 10).
+
+- Species-level niche metrics (marginality and specialization) estimated within each biome.  
+- PGLS results for each biome, tetrapod group, and ENFA metric across 100 phylogenetic trees (i.e., alternative species age estimates).  
+- Includes a data dictionary describing all variables.
+
+---
+
+#### `phylogenetic_signal/`
+Contains outputs of phylogenetic signal analyses for ENFA metrics.
+
+- Includes statistics such as Pagel’s λ and Blomberg’s K.  
+- Contains summary tables and intermediate outputs.  
+- Includes a data dictionary describing all variables.
+
+---
+
+#### `sensitivity_analyses/`
+Contains results from sensitivity analyses assessing robustness of ENFA metrics.
+
+**Spatial scale analyses:**
+- ENFA metrics calculated across the entire Neotropics (i.e., without biome stratification, VIF < 10).  
+- Includes species-level ENFA metrics and estimated/corrected species ages across 100 phylogenetic trees.  
+- PGLS results and summaries for each tetrapod group and ENFA metric (Neotropical marginality and specialization).
+
+**Bioclimatic variable selection:**
+- Contains subdirectories evaluating the effect of variable collinearity thresholds.
+
+  - `biomes_3th/`  
+    - Includes an R object with a hierarchical structure analogous to `vert_enfa_ages_list.RData`, but with biome-ENFA metrics calculated with a VIF < 3. 
+    - Includes PGLS summary results for tetrapod groups in which biome-based ENFA metrics derived under VIF < 3 and VIF < 10 show low agreement (Pearson correlation < 0.7). 
+
+  - `whole_neotropics_3th/`  
+    - ENFA metrics, for each tetrapod group, calculated across the entire Neotropics with a VIF < 3.  
+    - Includes PGLS summary results for tetrapod groups in which whole-based ENFA metrics derived under VIF < 3 and VIF < 10 show low agreement (Pearson correlation < 0.7). 
+
+- Each subdirectory includes its own data dictionary.
+
+---
+
+#### `weighted_enfa/`
+Contains ENFA results where marginality and specialization are weighted by species’ biome occupancy.
+
+- Species-level weighted ENFA metrics (w.marginality and w.specialization with a VIF < 10).  
+- PGLS results for each tetrapod group and each weighted ENFA metric across 100 phylogenetic trees.  
+- Includes a data dictionary describing all variables.
+
+---
+
+### 📑 Data dictionaries and metadata system
+
+This repository uses a **hierarchical and standardized metadata system**:
+
+1. **Dataset-specific dictionaries**  
+   Each main directory (e.g., `biomes_enfa/`, `weighted_enfa/`, `sensitivity_analyses/`) includes a data dictionary describing all variables in its datasets.
+
+2. **Standardized variable definitions**  
+   All data dictionaries were generated using a standardized internal mapping of variable names to descriptions and units, implemented in:
+
+   `results/scripts/functions/functions.R`
+
+   This mapping ensures consistency across all datasets and includes definitions for:
+   - Taxonomic variables (species, genus, family, etc.)  
+   - ENFA metrics (marginality, specialization)  
+   - Phylogenetic signal metrics (Pagel’s λ, Blomberg’s K)  
+   - Regression outputs (estimates, p-values, R²)  
+   - Species age estimates (million years, Myr)  
+   - Categorical variables (biome, extinction scenario)
+
+As a result, identical column names across different files always share the same meaning, units, and interpretation.
+
+---
+
+### ⚠️ Notes
+
+All datasets included here are **derived products** from ENFA and phylogenetic analyses.
+
+- No original shapefiles or phylogenetic trees are included.  
+- Data are provided in a form that prevents reconstruction of restricted original datasets.
+
+---
 
 ## 🧭 Analytical Workflow
 
