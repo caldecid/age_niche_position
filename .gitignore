@@ -1,4 +1,12 @@
-.Rproj.user
+# R / RStudio
 .Rhistory
+.Rproj.user/
 .RData
-.Ruserdata
+
+results/data/raw/
+
+results/data/metadata/
+
+# ignore heavy R objects
+results/data/processed/**/*.RData
+results/data/processed/**/*.rds

@@ -123,10 +123,11 @@ This directory serves as the main entry point for all datasets included in this 
 ### Subdirectories
 
 #### `biomes_enfa/`
-Contains ENFA results calculated separately for each biome (Variance Inflation Factor, VIF < 10).
+Contains ENFA PGLS results calculated separately for each biome (Variance Inflation Factor, VIF < 10).
 
-- Species-level niche metrics (marginality and specialization) estimated within each biome.  
-- PGLS results for each biome, tetrapod group, and ENFA metric across 100 phylogenetic trees (i.e., alternative species age estimates).  
+- PGLS results for each tetrapod group, ENFA metric, and each biome across 100 phylogenetic trees (i.e., alternative species age estimates).
+  - `tables/`
+    - PGLS summaries for each biome, ENFA metric, and each tetrapod group (mean values across 100 trees). 
 - Includes a data dictionary describing all variables.
 
 ---
@@ -144,9 +145,10 @@ Contains outputs of phylogenetic signal analyses for ENFA metrics.
 Contains results from sensitivity analyses assessing robustness of ENFA metrics.
 
 **Spatial scale analyses:**
-- ENFA metrics calculated across the entire Neotropics (i.e., without biome stratification, VIF < 10).  
-- Includes species-level ENFA metrics and estimated/corrected species ages across 100 phylogenetic trees.  
-- PGLS results and summaries for each tetrapod group and ENFA metric (Neotropical marginality and specialization).
+- ENFA metrics calculated across the entire Neotropics (i.e., without biome stratification, VIF < 10) from each tetrapod group.  
+- Includes species-level ENFA metrics and estimated/corrected species ages across 100 phylogenetic trees.
+  - `pgls_10th/`
+     - PGLS results and summaries for each tetrapod group and ENFA metric (Neotropical marginality and specialization).
 
 **Bioclimatic variable selection:**
 - Contains subdirectories evaluating the effect of variable collinearity thresholds.
@@ -156,8 +158,9 @@ Contains results from sensitivity analyses assessing robustness of ENFA metrics.
     - Includes PGLS summary results for tetrapod groups in which biome-based ENFA metrics derived under VIF < 3 and VIF < 10 show low agreement (Pearson correlation < 0.7). 
 
   - `whole_neotropics_3th/`  
-    - ENFA metrics, for each tetrapod group, calculated across the entire Neotropics with a VIF < 3.  
-    - Includes PGLS summary results for tetrapod groups in which whole-based ENFA metrics derived under VIF < 3 and VIF < 10 show low agreement (Pearson correlation < 0.7). 
+    - ENFA metrics, for each tetrapod group, calculated across the entire Neotropics with a VIF < 3.
+    - `pgls_3th/`
+       - Includes PGLS summary results for tetrapod groups in which whole-based ENFA metrics derived under VIF < 3 and VIF < 10 show low agreement (Pearson correlation < 0.7). 
 
 - Each subdirectory includes its own data dictionary.
 
@@ -167,7 +170,7 @@ Contains results from sensitivity analyses assessing robustness of ENFA metrics.
 Contains ENFA results where marginality and specialization are weighted by species’ biome occupancy.
 
 - Species-level weighted ENFA metrics (w.marginality and w.specialization with a VIF < 10).  
-- PGLS results for each tetrapod group and each weighted ENFA metric across 100 phylogenetic trees.  
+- PGLS general results and summaries for each tetrapod group and each weighted ENFA metric across 100 phylogenetic trees.  
 - Includes a data dictionary describing all variables.
 
 ---
